@@ -17,16 +17,16 @@ void InventorySlotPacket::write(BinaryStream& stream) const {
     stream.writeByte(mInventoryId);
     stream.writeUnsignedVarInt(mSlot);
     mFullContainerName.write(stream);
-    mStorageItem.write(stream);
-    mItem.write(stream);
+    mStorageItem.writeCereal(stream);
+    mItem.writeCereal(stream);
 }
 
 Result<> InventorySlotPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readByte(mInventoryId));
     _SCULK_READ(stream.readUnsignedVarInt(mSlot));
     _SCULK_READ(mFullContainerName.read(stream));
-    _SCULK_READ(mStorageItem.read(stream));
-    return mItem.read(stream);
+    _SCULK_READ(mStorageItem.readCereal(stream));
+    return mItem.readCereal(stream);
 }
 
 } // namespace sculk::protocol::inline abi_v975

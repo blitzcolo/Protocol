@@ -15,7 +15,7 @@ std::string_view MobEquipmentPacket::getName() const noexcept { return "MobEquip
 
 void MobEquipmentPacket::write(BinaryStream& stream) const {
     stream.writeUnsignedVarInt64(mRuntimeId);
-    mItem.write(stream);
+    mItem.writeCereal(stream);
     stream.writeByte(mSlotByte);
     stream.writeByte(mSelectedSlotByte);
     stream.writeByte(mContainerIdByte);
@@ -23,7 +23,7 @@ void MobEquipmentPacket::write(BinaryStream& stream) const {
 
 Result<> MobEquipmentPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt64(mRuntimeId));
-    _SCULK_READ(mItem.read(stream));
+    _SCULK_READ(mItem.readCereal(stream));
     _SCULK_READ(stream.readByte(mSlotByte));
     _SCULK_READ(stream.readByte(mSelectedSlotByte));
     return stream.readByte(mContainerIdByte);

@@ -13,7 +13,7 @@
 namespace sculk::protocol::inline abi_v975 {
 
 struct NetworkItemStackDescriptor {
-    int                mId{};
+    short              mId{};
     std::uint16_t      mStackSize{};
     std::uint32_t      mAux{};
     std::optional<int> mNetId{};
@@ -23,6 +23,10 @@ struct NetworkItemStackDescriptor {
     void write(BinaryStream& stream) const;
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
+
+    void writeCereal(BinaryStream& stream) const;
+
+    [[nodiscard]] Result<> readCereal(ReadOnlyBinaryStream& stream);
 };
 
 } // namespace sculk::protocol::inline abi_v975

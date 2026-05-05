@@ -23,7 +23,9 @@ void NetworkItemStackDescriptor::write(BinaryStream& stream) const {
 }
 
 [[nodiscard]] Result<> NetworkItemStackDescriptor::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(stream.readVarInt(mId));
+    int id{};
+    _SCULK_READ(stream.readVarInt(id));
+    mId = static_cast<short>(id);
     if (mId == 0) {
         return {}; // Empty item stack
     } else {
@@ -33,6 +35,24 @@ void NetworkItemStackDescriptor::write(BinaryStream& stream) const {
         _SCULK_READ(stream.readVarInt(mBlockRuntimeId));
         return stream.readString(mUserData);
     }
+}
+
+void NetworkItemStackDescriptor::writeCereal(BinaryStream& stream) const {
+    stream.writeSignedShort(mId);
+    stream.writeUnsignedShort(mStackSize);
+    stream.writeUnsignedVarInt(mAux);
+    stream.writeOptional(mNetId, &BinaryStream::writeVarInt);
+    stream.writeVarInt(mBlockRuntimeId);
+    stream.writeString(mUserData);
+}
+
+[[nodiscard]] Result<> NetworkItemStackDescriptor::readCereal(ReadOnlyBinaryStream& stream) {
+    _SCULK_READ(stream.readSignedShort(mId));
+    _SCULK_READ(stream.readUnsignedShort(mStackSize));
+    _SCULK_READ(stream.readUnsignedVarInt(mAux));
+    _SCULK_READ(stream.readOptional(mNetId, &ReadOnlyBinaryStream::readVarInt));
+    _SCULK_READ(stream.readVarInt(mBlockRuntimeId));
+    return stream.readString(mUserData);
 }
 
 } // namespace sculk::protocol::inline abi_v975
