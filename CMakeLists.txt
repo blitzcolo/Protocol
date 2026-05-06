@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
 
-if(NOT DEFINED CMAKE_TOOLCHAIN_FILE AND DEFINED ENV{VCPKG_ROOT})
-    set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "" FORCE)
-endif()
-
 project(Protocol VERSION 0.1.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
@@ -15,7 +11,6 @@ set(CMAKE_FIND_PACKAGE_PREFER_CONFIG ON)
 set(OPENSSL_USE_STATIC_LIBS ON)
 find_package(OpenSSL REQUIRED)
 
-set(REFLECTION_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
     reflection
     GIT_REPOSITORY https://github.com/SculkCatalystMC/Reflection.git

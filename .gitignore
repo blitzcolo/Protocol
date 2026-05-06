@@ -42,6 +42,9 @@
 
 # build directory
 /build/
+/build-clang/
+/build-msvc/
+/build-gcc/
 /docs/
 
 # IDE files

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include <cstdint>
 #include <utility>
 
 namespace sculk::protocol::inline abi_v975 {
