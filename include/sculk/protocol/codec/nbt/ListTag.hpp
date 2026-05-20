@@ -7,8 +7,8 @@
 
 #pragma once
 #include "TagType.hpp"
-#include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
-#include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
+#include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 #include <vector>
 
 namespace sculk::protocol::inline abi_v975 {

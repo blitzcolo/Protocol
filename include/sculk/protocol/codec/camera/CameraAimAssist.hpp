@@ -6,9 +6,9 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
-#include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
-#include "sculk/protocol/codec/utility/math/Vec2.hpp"
+#include "sculk/protocol/codec/math/Vec2.hpp"
+#include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 #include <map>
 #include <optional>
 

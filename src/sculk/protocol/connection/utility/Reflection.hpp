@@ -6,7 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "sculk/protocol/codec/utility/deps/Result.hpp"
+#include "sculk/protocol/utility/Result.hpp"
 #include <sculk/reflection/jsonc/reflection.hpp>
 
 namespace sculk::protocol::inline abi_v975::utils {

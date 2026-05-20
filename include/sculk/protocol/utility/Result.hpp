@@ -9,13 +9,13 @@
 #include <expected>
 #include <string_view>
 
-#ifdef SCULK_PROTOCOL_DEBUG
+#ifdef SCULK_PROTOCOL_DETAIL_ERROR
 #include <source_location>
 #endif
 
 namespace sculk::protocol::inline abi_v975 {
 
-#ifdef SCULK_PROTOCOL_DEBUG
+#ifdef SCULK_PROTOCOL_DETAIL_ERROR
 #define _SCULK_SL_PARAM_DEFAULT , std::source_location location = std::source_location::current()
 #define _SCULK_SL_PARAMETER_DEF , std::source_location location
 #define _SCULK_SL_PARAM_PASS    , location
@@ -29,11 +29,11 @@ namespace sculk::protocol::inline abi_v975 {
 
 struct ErrorInfo {
     std::string_view mMessage{};
-#ifdef SCULK_PROTOCOL_DEBUG
+#ifdef SCULK_PROTOCOL_DETAIL_ERROR
     std::source_location mLocation{};
 #endif
 
-#ifdef SCULK_PROTOCOL_DEBUG
+#ifdef SCULK_PROTOCOL_DETAIL_ERROR
     [[nodiscard]] constexpr ErrorInfo(std::string_view message, std::source_location location) noexcept
     : mMessage(message),
       mLocation(location) {}

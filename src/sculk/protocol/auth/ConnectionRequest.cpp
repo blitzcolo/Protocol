@@ -5,4 +5,11 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-#include "sculk/protocol/connection/auth/LoginRequest.hpp"
+#include "sculk/protocol/auth/ConnectionRequest.hpp"
+
+
+namespace sculk::protocol::inline abi_v975 {
+
+//
+
+} // namespace sculk::protocol::inline abi_v975

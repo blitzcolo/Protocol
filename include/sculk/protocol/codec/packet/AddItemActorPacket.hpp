@@ -8,8 +8,8 @@
 #pragma once
 #include "sculk/protocol/codec/actor/MetaData.hpp"
 #include "sculk/protocol/codec/inventory/item/NetworkItemStackDescriptor.hpp"
+#include "sculk/protocol/codec/math/Vec3.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
-#include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 

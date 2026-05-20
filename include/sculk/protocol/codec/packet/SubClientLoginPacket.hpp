@@ -7,7 +7,6 @@
 
 #pragma once
 #include "sculk/protocol/codec/packet/IPacket.hpp"
-#include "sculk/protocol/connection/ConnectionRequest.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 

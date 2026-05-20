@@ -22,6 +22,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+option(PROTOCOL_ENABLE_DETAIL_ERROR "Enable detailed error information" OFF)
 option(PROTOCOL_DISABLE_CODEC "Disable codec features" OFF)
 option(PROTOCOL_DISABLE_AUTHENTICATION "Disable authentication features" OFF)
 option(PROTOCOL_DISABLE_CONNECTION "Disable connection features" OFF)
@@ -60,6 +61,10 @@ if(NOT PROTOCOL_DISABLE_CONNECTION)
     list(APPEND PROTOCOL_INSTALL_INCLUDE_DIRS "sculk/protocol/connection")
 endif()
 
+if(PROTOCOL_ENABLE_DETAIL_ERROR)
+    target_compile_definitions(Protocol PRIVATE SCULK_PROTOCOL_DETAIL_ERROR)
+endif()
+
 add_library(Protocol STATIC)
 
 if(PROTOCOL_SOURCES)
@@ -74,9 +79,6 @@ set_target_properties(Protocol PROPERTIES
 )
 
 target_compile_features(Protocol PUBLIC cxx_std_23)
-target_compile_definitions(Protocol PRIVATE
-    $<$<CONFIG:Debug>:SCULK_PROTOCOL_DEBUG>
-)
 target_link_libraries(Protocol PRIVATE reflection::reflection OpenSSL::Crypto)
 
 target_include_directories(Protocol PUBLIC

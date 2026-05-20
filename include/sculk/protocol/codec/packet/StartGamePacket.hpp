@@ -13,10 +13,10 @@
 #include "sculk/protocol/codec/level/ServerConfiguration.hpp"
 #include "sculk/protocol/codec/level/ServerTelemetryData.hpp"
 #include "sculk/protocol/codec/level/block/BlockProperty.hpp"
+#include "sculk/protocol/codec/math/Vec2.hpp"
+#include "sculk/protocol/codec/math/Vec3.hpp"
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
-#include "sculk/protocol/codec/utility/math/Vec2.hpp"
-#include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 

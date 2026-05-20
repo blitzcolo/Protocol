@@ -6,29 +6,12 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include "sculk/protocol/codec/utility/deps/BinaryStream.hpp"
-#include "sculk/protocol/codec/utility/deps/ReadOnlyBinaryStream.hpp"
+#include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 #include <magic_enum/magic_enum.hpp>
-#include <sculk/reflection/utils/string_utils.hpp>
 #include <type_traits>
 
 namespace sculk::protocol::inline abi_v975::utils {
-
-template <typename Enum>
-    requires std::is_enum_v<Enum>
-constexpr std::string_view enum_to_str(Enum value) {
-    auto name = magic_enum::enum_name(value);
-    if (name.empty()) return magic_enum::enum_name(Enum{});
-    return name;
-}
-
-template <typename Enum>
-    requires std::is_enum_v<Enum>
-constexpr Enum str_to_enum(std::string_view value) {
-    auto opt = magic_enum::enum_cast<Enum>(value, magic_enum::case_insensitive);
-    if (!opt.has_value()) return Enum{};
-    return *opt;
-}
 
 template <typename T>
     requires std::is_enum_v<T>
@@ -38,14 +21,27 @@ readEnumName(ReadOnlyBinaryStream& stream, T& outValue _SCULK_SL_PARAM_DEFAULT) 
     if (!stream.readString(enumName _SCULK_SL_PARAM_PASS)) {
         return error_utils::makeError("ReadOnlyBinaryStream::readEnumName overflowed" _SCULK_SL_PARAM_PASS);
     }
-    outValue = utils::str_to_enum<T>(enumName);
+    auto enumValue = magic_enum::enum_cast<T>(enumName, magic_enum::case_insensitive);
+    if (!enumValue.has_value()) {
+        return error_utils::makeError(
+            "ReadOnlyBinaryStream::readEnumName received an invalid enum name" _SCULK_SL_PARAM_PASS
+        );
+    }
+    outValue = *enumValue;
     return {};
 }
 
 template <typename T>
     requires std::is_enum_v<T>
 constexpr void writeEnumName(BinaryStream& stream, T value) {
-    stream.writeString(reflection::string_utils::to_lower_case(utils::enum_to_str(value)));
+    auto name = std::string(magic_enum::enum_name(value));
+    if (name.empty()) {
+        name = std::string(magic_enum::enum_name(T{}));
+    }
+    for (char& c : name) {
+        c = static_cast<char>(std::tolower(static_cast<std::uint8_t>(c)));
+    }
+    stream.writeString(name);
 }
 
 } // namespace sculk::protocol::inline abi_v975::utils

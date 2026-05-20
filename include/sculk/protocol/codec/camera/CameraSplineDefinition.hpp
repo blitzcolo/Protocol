@@ -7,7 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/codec/camera/EasingType.hpp"
-#include "sculk/protocol/codec/utility/math/Vec3.hpp"
+#include "sculk/protocol/codec/math/Vec3.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 

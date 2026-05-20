@@ -6,14 +6,19 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
-#include <cstdint>
+#include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
-enum class CompressionAlgorithm : std::uint16_t {
-    None   = static_cast<std::uint16_t>(-1),
-    Zlib   = 0,
-    Snappy = 1,
+struct Vec3 {
+    float mX{};
+    float mY{};
+    float mZ{};
+
+    void write(BinaryStream& stream) const;
+
+    [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
 };
 
 } // namespace sculk::protocol::inline abi_v975

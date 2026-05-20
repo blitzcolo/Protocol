@@ -10,9 +10,9 @@
 #include "sculk/protocol/codec/actor/player/PlayerBlockActions.hpp"
 #include "sculk/protocol/codec/inventory/item/ItemStackRequest.hpp"
 #include "sculk/protocol/codec/inventory/transaction/PackedItemUseLegacyInventoryTransaction.hpp"
+#include "sculk/protocol/codec/math/Vec2.hpp"
+#include "sculk/protocol/codec/math/Vec3.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
-#include "sculk/protocol/codec/utility/math/Vec2.hpp"
-#include "sculk/protocol/codec/utility/math/Vec3.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 

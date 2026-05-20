@@ -15,7 +15,7 @@ std::string_view NetworkSettingsPacket::getName() const noexcept { return "Netwo
 
 void NetworkSettingsPacket::write(BinaryStream& stream) const {
     stream.writeUnsignedShort(mCompressionThreshold);
-    stream.writeEnum(mCompressionAlgorithm, &BinaryStream::writeUnsignedShort);
+    stream.writeEnum(mCompressionAlgorithm, &BinaryStream::writeSignedShort);
     stream.writeBool(mClientThrottleEnabled);
     stream.writeByte(mClientThrottleThreshold);
     stream.writeFloat(mClientThrottleScalar);
@@ -23,7 +23,7 @@ void NetworkSettingsPacket::write(BinaryStream& stream) const {
 
 Result<> NetworkSettingsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedShort(mCompressionThreshold));
-    _SCULK_READ(stream.readEnum(mCompressionAlgorithm, &ReadOnlyBinaryStream::readUnsignedShort));
+    _SCULK_READ(stream.readEnum(mCompressionAlgorithm, &ReadOnlyBinaryStream::readSignedShort));
     _SCULK_READ(stream.readBool(mClientThrottleEnabled));
     _SCULK_READ(stream.readByte(mClientThrottleThreshold));
     return stream.readFloat(mClientThrottleScalar);

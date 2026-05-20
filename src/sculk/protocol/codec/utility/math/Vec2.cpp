@@ -5,7 +5,7 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-#include "sculk/protocol/codec/utility/math/Vec2.hpp"
+#include "sculk/protocol/codec/math/Vec2.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 

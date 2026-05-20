@@ -7,11 +7,17 @@
 
 #pragma once
 #include "sculk/protocol/codec/packet/IPacket.hpp"
-#include "sculk/protocol/connection/CompressionAlgorithm.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
 class NetworkSettingsPacket : public IPacket {
+public:
+    enum class CompressionAlgorithm : std::int16_t {
+        None   = -1,
+        Zlib   = 0,
+        Snappy = 1,
+    };
+
 public:
     std::uint16_t        mCompressionThreshold{1};
     CompressionAlgorithm mCompressionAlgorithm{};

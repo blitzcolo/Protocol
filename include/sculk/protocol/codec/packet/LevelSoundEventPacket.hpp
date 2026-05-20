@@ -7,8 +7,8 @@
 
 #pragma once
 #include "sculk/protocol/codec/level/LevelSoundEvent.hpp"
+#include "sculk/protocol/codec/math/Vec3.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
-#include "sculk/protocol/codec/utility/math/Vec3.hpp"
 #include <optional>
 
 namespace sculk::protocol::inline abi_v975 {

@@ -1,4 +1,4 @@
-// Copyright © 2026 SculkCatalystMC. All rights reserved.
+﻿// Copyright © 2026 SculkCatalystMC. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
 // distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -6,18 +6,19 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "AuthenticationType.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include "sculk/protocol/utility/Result.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
-struct CommandSoftEnumData {
-    std::string              mName{};
-    std::vector<std::string> mValues{};
-
-    void write(BinaryStream& stream) const;
-
-    [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream);
+class ConnectionRequest {
+public:
+    AuthenticationType         mAuthenticationType{};
+    std::optional<std::string> mLegacyCertificate{};
+    std::string                mToken{};
+    std::string                mClientProperties{};
 };
 
 } // namespace sculk::protocol::inline abi_v975
