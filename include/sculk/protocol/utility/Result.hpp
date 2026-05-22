@@ -10,7 +10,9 @@
 #include <string_view>
 
 #ifdef SCULK_PROTOCOL_DETAIL_ERROR
+#include <format>
 #include <source_location>
+#include <string>
 #endif
 
 namespace sculk::protocol::inline abi_v975 {
@@ -28,17 +30,32 @@ namespace sculk::protocol::inline abi_v975 {
 #endif
 
 struct ErrorInfo {
-    std::string_view mMessage{};
 #ifdef SCULK_PROTOCOL_DETAIL_ERROR
     std::source_location mLocation{};
+    std::string          mMessage{};
+#else
+    std::string_view mMessage{};
 #endif
 
 #ifdef SCULK_PROTOCOL_DETAIL_ERROR
-    [[nodiscard]] constexpr ErrorInfo(std::string_view message, std::source_location location) noexcept
+    [[nodiscard]] constexpr ErrorInfo(std::string_view message, std::source_location location)
     : mMessage(message),
       mLocation(location) {}
+
+    [[nodiscard]] std::string message() const {
+        return std::format(
+            "{} ({}:{}:{}:{})",
+            mMessage,
+            mLocation.file_name(),
+            mLocation.line(),
+            mLocation.column(),
+            mLocation.function_name()
+        );
+    }
 #else
     [[nodiscard]] constexpr explicit ErrorInfo(std::string_view message) noexcept : mMessage(message) {}
+
+    [[nodiscard]] std::string_view message() const noexcept { return mMessage; }
 #endif
 };
 
@@ -47,9 +64,16 @@ using Result = std::expected<T, ErrorInfo>;
 
 namespace error_utils {
 
-[[nodiscard]] constexpr std::unexpected<ErrorInfo> makeError(std::string_view error _SCULK_SL_PARAM_DEFAULT) noexcept {
-    return std::unexpected(ErrorInfo(error _SCULK_SL_PARAM_PASS));
+#ifdef SCULK_PROTOCOL_DETAIL_ERROR
+[[nodiscard]] constexpr std::unexpected<ErrorInfo>
+makeError(std::string_view error, std::source_location location = std::source_location::current()) {
+    return std::unexpected(ErrorInfo(error, location));
 }
+#else
+[[nodiscard]] constexpr std::unexpected<ErrorInfo> makeError(std::string_view error) noexcept {
+    return std::unexpected(ErrorInfo(error));
+}
+#endif
 
 } // namespace error_utils
 

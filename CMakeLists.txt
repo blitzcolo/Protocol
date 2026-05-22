@@ -61,10 +61,6 @@ if(NOT PROTOCOL_DISABLE_CONNECTION)
     list(APPEND PROTOCOL_INSTALL_INCLUDE_DIRS "sculk/protocol/connection")
 endif()
 
-if(PROTOCOL_ENABLE_DETAIL_ERROR)
-    target_compile_definitions(Protocol PRIVATE SCULK_PROTOCOL_DETAIL_ERROR)
-endif()
-
 add_library(Protocol STATIC)
 
 if(PROTOCOL_SOURCES)
@@ -85,6 +81,10 @@ target_include_directories(Protocol PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
+
+if(PROTOCOL_ENABLE_DETAIL_ERROR)
+    target_compile_definitions(Protocol PRIVATE SCULK_PROTOCOL_DETAIL_ERROR)
+endif()
 
 if(MSVC)
     target_compile_options(Protocol PRIVATE

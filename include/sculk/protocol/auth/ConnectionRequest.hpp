@@ -7,18 +7,36 @@
 
 #pragma once
 #include "AuthenticationType.hpp"
-#include "sculk/protocol/utility/BinaryStream.hpp"
-#include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include "ClientProperties.hpp"
+#include "LegacyCertificateChain.hpp"
+#include "LoginToken.hpp"
 #include "sculk/protocol/utility/Result.hpp"
+#include <optional>
+#include <string>
 
 namespace sculk::protocol::inline abi_v975 {
 
 class ConnectionRequest {
 public:
-    AuthenticationType         mAuthenticationType{};
-    std::optional<std::string> mLegacyCertificate{};
-    std::string                mToken{};
-    std::string                mClientProperties{};
+    AuthenticationType                    mAuthenticationType{};
+    std::optional<LegacyCertificateChain> mLegacyCertificateChain{};
+    std::optional<LoginToken>             mLoginToken{};
+    ClientProperties                      mClientProperties{};
+
+public:
+    [[nodiscard]] bool verify() const noexcept;
+
+    [[nodiscard]] std::string toString() const;
+
+public:
+    [[nodiscard]] static Result<ConnectionRequest> fromString(std::string_view rawRequest);
+
+    [[nodiscard]] static Result<ConnectionRequest> create(
+        AuthenticationType           authenticationType,
+        std::optional<std::string>&& legacyCertificateChainString,
+        std::optional<std::string>&& loginTokenString,
+        std::string&&                clientPropertiesString
+    );
 };
 
 } // namespace sculk::protocol::inline abi_v975
