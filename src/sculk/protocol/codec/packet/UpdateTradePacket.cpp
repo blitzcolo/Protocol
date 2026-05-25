@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdateTradePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -37,6 +38,19 @@ Result<> UpdateTradePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mUseNewTradeScreen));
     _SCULK_READ(stream.readBool(mUseEconomyTrade));
     return mOffers.read(stream);
+}
+
+std::string UpdateTradePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mContainerId),
+        SCULK_FORMAT_FIELD(mContainerType),
+        SCULK_FORMAT_FIELD(mSize),
+        SCULK_FORMAT_FIELD(mTier),
+        SCULK_FORMAT_FIELD(mEntityUniqueId),
+        SCULK_FORMAT_FIELD(mLastTradingPlayer),
+        SCULK_FORMAT_FIELD(mDisplayName),
+        SCULK_FORMAT_FIELD(mOffers)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

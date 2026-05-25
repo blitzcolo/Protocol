@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdateAbilitiesPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view UpdateAbilitiesPacket::getName() const noexcept { return "Updat
 void UpdateAbilitiesPacket::write(BinaryStream& stream) const { mAbilities.write(stream); }
 
 Result<> UpdateAbilitiesPacket::read(ReadOnlyBinaryStream& stream) { return mAbilities.read(stream); }
+
+std::string UpdateAbilitiesPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mAbilities)); }
 
 } // namespace sculk::protocol::inline abi_v975

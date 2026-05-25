@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerSkinPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,15 @@ Result<> PlayerSkinPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mSerializedSkin.read(stream));
     _SCULK_READ(stream.readString(mNewSkinName));
     return stream.readString(mOldSkinName);
+}
+
+std::string PlayerSkinPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mUUID),
+        SCULK_FORMAT_FIELD(mSerializedSkin),
+        SCULK_FORMAT_FIELD(mNewSkinName),
+        SCULK_FORMAT_FIELD(mOldSkinName)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

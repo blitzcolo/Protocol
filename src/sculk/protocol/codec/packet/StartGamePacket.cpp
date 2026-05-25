@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/StartGamePacket.hpp"
+#include "../utility/Format.hpp"
 #include "sculk/protocol/codec/nbt/TagType.hpp"
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 
@@ -69,6 +70,36 @@ Result<> StartGamePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mServerAuthSound));
     _SCULK_READ(stream.readOptional(mServerConfigurationJoinInfo, &ServerConfigurationJoinInfo::read));
     return mServerTelemetryData.read(stream);
+}
+
+std::string StartGamePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorUniqueId),
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mGameType),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mRotation),
+        SCULK_FORMAT_FIELD(mLevelSettings),
+        SCULK_FORMAT_FIELD(mLevelId),
+        SCULK_FORMAT_FIELD(mLevelName),
+        SCULK_FORMAT_FIELD(mTemplateContentIdentity),
+        SCULK_FORMAT_FIELD(mIsTrial),
+        SCULK_FORMAT_FIELD(mMovementSettings),
+        SCULK_FORMAT_FIELD(mCurrentTime),
+        SCULK_FORMAT_FIELD(mEnchantmentSeed),
+        SCULK_FORMAT_FIELD(mBlockProperties),
+        SCULK_FORMAT_FIELD(mMultiPlayerCorrelationId),
+        SCULK_FORMAT_FIELD(mEnableItemStackNetManager),
+        SCULK_FORMAT_FIELD(mServerVersion),
+        SCULK_FORMAT_FIELD(mPlayerPropertyData),
+        SCULK_FORMAT_FIELD(mServerBlockCheckSum),
+        SCULK_FORMAT_FIELD(mWorldTemplateId),
+        SCULK_FORMAT_FIELD(mClientGen),
+        SCULK_FORMAT_FIELD(mEnableHashId),
+        SCULK_FORMAT_FIELD(mServerAuthSound),
+        SCULK_FORMAT_FIELD(mServerConfigurationJoinInfo),
+        SCULK_FORMAT_FIELD(mServerTelemetryData)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UnlockedRecipesPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void UnlockedRecipesPacket::write(BinaryStream& stream) const {
 Result<> UnlockedRecipesPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mPacketType, &ReadOnlyBinaryStream::readUnsignedInt));
     return stream.readArray(mUnlockedRecipesList, &ReadOnlyBinaryStream::readString);
+}
+
+std::string UnlockedRecipesPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mPacketType), SCULK_FORMAT_FIELD(mUnlockedRecipesList));
 }
 
 } // namespace sculk::protocol::inline abi_v975

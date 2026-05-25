@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CameraAimAssistPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -29,6 +30,16 @@ Result<> CameraAimAssistPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mTargetMode, &ReadOnlyBinaryStream::readByte));
     _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readByte));
     return stream.readBool(mShowDebugRender);
+}
+
+std::string CameraAimAssistPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPresetId),
+        SCULK_FORMAT_FIELD(mViewAngle),
+        SCULK_FORMAT_FIELD(mDistance),
+        SCULK_FORMAT_FIELD(mTargetMode),
+        SCULK_FORMAT_FIELD(mAction)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

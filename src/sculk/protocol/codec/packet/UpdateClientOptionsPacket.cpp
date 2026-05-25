@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdateClientOptionsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,10 @@ Result<> UpdateClientOptionsPacket::read(ReadOnlyBinaryStream& stream) {
         return stream.readEnum(mode, &ReadOnlyBinaryStream::readByte);
     }));
     return stream.readOptional(mFilterProfanity, &ReadOnlyBinaryStream::readBool);
+}
+
+std::string UpdateClientOptionsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mGraphicsModeChange), SCULK_FORMAT_FIELD(mFilterProfanity));
 }
 
 } // namespace sculk::protocol::inline abi_v975

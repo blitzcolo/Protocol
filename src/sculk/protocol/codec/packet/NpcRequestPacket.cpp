@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/NpcRequestPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,16 @@ Result<> NpcRequestPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mActions));
     _SCULK_READ(stream.readByte(mActionIndex));
     return stream.readString(mSceneName);
+}
+
+std::string NpcRequestPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mRequestType),
+        SCULK_FORMAT_FIELD(mActions),
+        SCULK_FORMAT_FIELD(mActionIndex),
+        SCULK_FORMAT_FIELD(mSceneName)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

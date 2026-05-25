@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SpawnParticleEffectPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,16 @@ Result<> SpawnParticleEffectPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mPosition.read(stream));
     _SCULK_READ(stream.readString(mEffectName));
     return stream.readOptional(mMolangVariableMap, &ReadOnlyBinaryStream::readString);
+}
+
+std::string SpawnParticleEffectPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mDimensionId),
+        SCULK_FORMAT_FIELD(mActorUniqueId),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mEffectName),
+        SCULK_FORMAT_FIELD(mMolangVariableMap)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

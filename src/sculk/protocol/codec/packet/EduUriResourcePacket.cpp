@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/EduUriResourcePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void EduUriResourcePacket::write(BinaryStream& stream) const {
 Result<> EduUriResourcePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mButtonName));
     return stream.readString(mLinkUri);
+}
+
+std::string EduUriResourcePacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mButtonName), SCULK_FORMAT_FIELD(mLinkUri));
 }
 
 } // namespace sculk::protocol::inline abi_v975

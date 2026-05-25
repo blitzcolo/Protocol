@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CompletedUsingItemPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void CompletedUsingItemPacket::write(BinaryStream& stream) const {
 Result<> CompletedUsingItemPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readSignedShort(mItemId));
     return stream.readSignedInt(mUseMethod);
+}
+
+std::string CompletedUsingItemPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mItemId), SCULK_FORMAT_FIELD(mUseMethod));
 }
 
 } // namespace sculk::protocol::inline abi_v975

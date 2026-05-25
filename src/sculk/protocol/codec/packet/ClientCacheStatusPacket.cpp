@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientCacheStatusPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,9 @@ std::string_view ClientCacheStatusPacket::getName() const noexcept { return "Cli
 void ClientCacheStatusPacket::write(BinaryStream& stream) const { stream.writeBool(mIsCacheSupport); }
 
 Result<> ClientCacheStatusPacket::read(ReadOnlyBinaryStream& stream) { return stream.readBool(mIsCacheSupport); }
+
+std::string ClientCacheStatusPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mIsCacheSupport));
+}
 
 } // namespace sculk::protocol::inline abi_v975

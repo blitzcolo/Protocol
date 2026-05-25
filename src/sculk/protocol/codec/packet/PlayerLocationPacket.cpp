@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerLocationPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -28,6 +29,14 @@ Result<> PlayerLocationPacket::read(ReadOnlyBinaryStream& stream) {
         return mPosition.read(stream);
     }
     return {};
+}
+
+std::string PlayerLocationPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mType),
+        SCULK_FORMAT_FIELD(mActorUniqueId),
+        SCULK_FORMAT_FIELD(mPosition)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

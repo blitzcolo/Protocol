@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ModalFormResponsePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,14 @@ Result<> ModalFormResponsePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readOptional(mCancelReason, [](ReadOnlyBinaryStream& stream, CancelReason& reason) {
         return stream.readEnum(reason, &ReadOnlyBinaryStream::readByte);
     });
+}
+
+std::string ModalFormResponsePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mFormId),
+        SCULK_FORMAT_FIELD(mResponse),
+        SCULK_FORMAT_FIELD(mCancelReason)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

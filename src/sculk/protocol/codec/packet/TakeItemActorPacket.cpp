@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/TakeItemActorPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,11 @@ void TakeItemActorPacket::write(BinaryStream& stream) const {
 Result<> TakeItemActorPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt64(mItemRuntimeId));
     return stream.readUnsignedVarInt64(mActorRuntimeId);
+}
+
+
+std::string TakeItemActorPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mItemRuntimeId), SCULK_FORMAT_FIELD(mActorRuntimeId));
 }
 
 } // namespace sculk::protocol::inline abi_v975

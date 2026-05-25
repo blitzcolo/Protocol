@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SpawnExperienceOrbPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void SpawnExperienceOrbPacket::write(BinaryStream& stream) const {
 Result<> SpawnExperienceOrbPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mPosition.read(stream));
     return stream.readVarInt(mXpValue);
+}
+
+std::string SpawnExperienceOrbPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mPosition), SCULK_FORMAT_FIELD(mXpValue));
 }
 
 } // namespace sculk::protocol::inline abi_v975

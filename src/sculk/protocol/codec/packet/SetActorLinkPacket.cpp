@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetActorLinkPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view SetActorLinkPacket::getName() const noexcept { return "SetActor
 void SetActorLinkPacket::write(BinaryStream& stream) const { mLink.write(stream); }
 
 Result<> SetActorLinkPacket::read(ReadOnlyBinaryStream& stream) { return mLink.read(stream); }
+
+std::string SetActorLinkPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mLink)); }
 
 } // namespace sculk::protocol::inline abi_v975

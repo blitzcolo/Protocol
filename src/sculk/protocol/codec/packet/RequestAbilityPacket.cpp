@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/RequestAbilityPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -30,6 +31,15 @@ Result<> RequestAbilityPacket::read(ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readFloat(mFloatValue));
     }
     return {};
+}
+
+std::string RequestAbilityPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mAbility),
+        SCULK_FORMAT_FIELD(mType),
+        SCULK_FORMAT_FIELD(mBoolValue),
+        SCULK_FORMAT_FIELD(mFloatValue)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

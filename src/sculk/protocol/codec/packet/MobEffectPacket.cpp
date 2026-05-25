@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MobEffectPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -33,6 +34,19 @@ Result<> MobEffectPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVarInt(mEffectDurationTicks));
     _SCULK_READ(stream.readUnsignedVarInt64(mTick));
     return stream.readBool(mAmbient);
+}
+
+std::string MobEffectPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mEventId),
+        SCULK_FORMAT_FIELD(mEffectId),
+        SCULK_FORMAT_FIELD(mEffectAmplifier),
+        SCULK_FORMAT_FIELD(mShowParticles),
+        SCULK_FORMAT_FIELD(mEffectDurationTicks),
+        SCULK_FORMAT_FIELD(mTick),
+        SCULK_FORMAT_FIELD(mAmbient)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

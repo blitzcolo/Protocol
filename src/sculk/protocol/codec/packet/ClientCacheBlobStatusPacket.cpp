@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientCacheBlobStatusPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -40,6 +41,10 @@ Result<> ClientCacheBlobStatusPacket::read(ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readUnsignedInt64(id));
     }
     return {};
+}
+
+std::string ClientCacheBlobStatusPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mMissingIds), SCULK_FORMAT_FIELD(mFoundIds));
 }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/InventoryTransactionPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -33,6 +34,15 @@ Result<> InventoryTransactionPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVariantIndex<std::uint32_t>(mTransactionData, &ReadOnlyBinaryStream::readUnsignedVarInt));
     _SCULK_READ(mInventoryTransactionActions.read(stream));
     return std::visit([&](auto& transaction) { return transaction.read(stream); }, mTransactionData);
+}
+
+std::string InventoryTransactionPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mLegacyRequestRawId),
+        SCULK_FORMAT_FIELD(mLegacySetItemSlots),
+        SCULK_FORMAT_FIELD(mInventoryTransactionActions),
+        SCULK_FORMAT_FIELD(mTransactionData)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

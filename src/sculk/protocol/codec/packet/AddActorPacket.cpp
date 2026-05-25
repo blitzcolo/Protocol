@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AddActorPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -41,6 +42,23 @@ Result<> AddActorPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mMetaData.read(stream));
     _SCULK_READ(mSynchedProperties.read(stream));
     return stream.readArray(mActorLinks, &ActorLink::read);
+}
+
+std::string AddActorPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mActorUniqueId),
+        SCULK_FORMAT_FIELD(mIdentifier),
+        SCULK_FORMAT_FIELD(mActorLinks),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mVelocity),
+        SCULK_FORMAT_FIELD(mRotation),
+        SCULK_FORMAT_FIELD(mYHeadRotation),
+        SCULK_FORMAT_FIELD(mYBodyRotation),
+        SCULK_FORMAT_FIELD(mMetaData),
+        SCULK_FORMAT_FIELD(mAttributes),
+        SCULK_FORMAT_FIELD(mSynchedProperties)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

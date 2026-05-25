@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/DimensionDataPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -36,5 +37,7 @@ void DimensionDataPacket::write(BinaryStream& stream) const {
 Result<> DimensionDataPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mDefinitionGroup, &DimensionDefinition::read);
 }
+
+std::string DimensionDataPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mDefinitionGroup)); }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerUpdateEntityOverridesPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -53,6 +54,15 @@ Result<> PlayerUpdateEntityOverridesPacket::read(ReadOnlyBinaryStream& stream) {
         break;
     }
     return {};
+}
+
+std::string PlayerUpdateEntityOverridesPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mValue),
+        SCULK_FORMAT_FIELD(mUpdateType),
+        SCULK_FORMAT_FIELD(mId),
+        SCULK_FORMAT_FIELD(mPropertyIndex)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

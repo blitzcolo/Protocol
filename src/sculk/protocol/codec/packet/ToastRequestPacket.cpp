@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ToastRequestPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void ToastRequestPacket::write(BinaryStream& stream) const {
 Result<> ToastRequestPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mTitle));
     return stream.readString(mContent);
+}
+
+std::string ToastRequestPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mTitle), SCULK_FORMAT_FIELD(mContent));
 }
 
 } // namespace sculk::protocol::inline abi_v975

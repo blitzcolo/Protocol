@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/RemoveVolumeEntityPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void RemoveVolumeEntityPacket::write(BinaryStream& stream) const {
 Result<> RemoveVolumeEntityPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt(mEntityNetId));
     return stream.readVarInt(mDimensionType);
+}
+
+std::string RemoveVolumeEntityPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mEntityNetId), SCULK_FORMAT_FIELD(mDimensionType));
 }
 
 } // namespace sculk::protocol::inline abi_v975

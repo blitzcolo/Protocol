@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/BookEditPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -61,6 +62,18 @@ Result<> BookEditPacket::read(ReadOnlyBinaryStream& stream) {
     default:
         return {};
     }
+}
+
+std::string BookEditPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mAction),
+        SCULK_FORMAT_FIELD(mBookSlot),
+        SCULK_FORMAT_FIELD(mPageIndexA),
+        SCULK_FORMAT_FIELD(mPageIndexB),
+        SCULK_FORMAT_FIELD(mTextA),
+        SCULK_FORMAT_FIELD(mTextB),
+        SCULK_FORMAT_FIELD(mXuid)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

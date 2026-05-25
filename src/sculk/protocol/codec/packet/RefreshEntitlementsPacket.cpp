@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/RefreshEntitlementsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view RefreshEntitlementsPacket::getName() const noexcept { return "R
 void RefreshEntitlementsPacket::write(BinaryStream&) const {}
 
 Result<> RefreshEntitlementsPacket::read(ReadOnlyBinaryStream&) { return {}; }
+
+std::string RefreshEntitlementsPacket::toString() const { return SCULK_FORMAT_PACKET(); }
 
 } // namespace sculk::protocol::inline abi_v975

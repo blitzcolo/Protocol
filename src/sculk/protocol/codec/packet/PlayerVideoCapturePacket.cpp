@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerVideoCapturePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -40,5 +41,7 @@ Result<> PlayerVideoCapturePacket::read(ReadOnlyBinaryStream& stream) {
         mParams
     );
 }
+
+std::string PlayerVideoCapturePacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mParams)); }
 
 } // namespace sculk::protocol::inline abi_v975

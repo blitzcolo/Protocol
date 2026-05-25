@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/NetworkSettingsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,15 @@ Result<> NetworkSettingsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mClientThrottleEnabled));
     _SCULK_READ(stream.readByte(mClientThrottleThreshold));
     return stream.readFloat(mClientThrottleScalar);
+}
+
+std::string NetworkSettingsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mCompressionAlgorithm),
+        SCULK_FORMAT_FIELD(mClientThrottleEnabled),
+        SCULK_FORMAT_FIELD(mClientThrottleThreshold),
+        SCULK_FORMAT_FIELD(mClientThrottleScalar)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

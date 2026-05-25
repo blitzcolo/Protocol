@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SimpleEventPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -20,5 +21,7 @@ void SimpleEventPacket::write(BinaryStream& stream) const {
 Result<> SimpleEventPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mType, &ReadOnlyBinaryStream::readUnsignedShort);
 }
+
+std::string SimpleEventPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mType)); }
 
 } // namespace sculk::protocol::inline abi_v975

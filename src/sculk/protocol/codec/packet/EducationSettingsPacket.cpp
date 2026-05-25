@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/EducationSettingsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -55,6 +56,21 @@ Result<> EducationSettingsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readOptional(mCodeBuilderOverrideUrl, &ReadOnlyBinaryStream::readString));
     _SCULK_READ(stream.readBool(mAlwaysFalse));
     return stream.readOptional(mExternalLinkSettings, &ExternalLinkSettings::read);
+}
+
+std::string EducationSettingsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mCodeBuilderDefaultUrl),
+        SCULK_FORMAT_FIELD(mCodeBuilderTitle),
+        SCULK_FORMAT_FIELD(mCanResizeCodeBuilder),
+        SCULK_FORMAT_FIELD(mDisableLegacyTitleBar),
+        SCULK_FORMAT_FIELD(mPostProcessFilter),
+        SCULK_FORMAT_FIELD(mScreenshotBorderResourcePath),
+        SCULK_FORMAT_FIELD(mAgentCapabilities),
+        SCULK_FORMAT_FIELD(mCodeBuilderOverrideUrl),
+        SCULK_FORMAT_FIELD(mAlwaysFalse),
+        SCULK_FORMAT_FIELD(mExternalLinkSettings)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

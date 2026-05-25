@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerInputPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -24,5 +25,7 @@ Result<> PlayerInputPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mJumping));
     return stream.readBool(mSneaking);
 }
+
+std::string PlayerInputPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mMove)); }
 
 } // namespace sculk::protocol::inline abi_v975

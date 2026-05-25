@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/LabTablePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,10 @@ Result<> LabTablePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mType, &ReadOnlyBinaryStream::readByte));
     _SCULK_READ(mPosition.read(stream));
     return stream.readEnum(mReaction, &ReadOnlyBinaryStream::readByte);
+}
+
+std::string LabTablePacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mType), SCULK_FORMAT_FIELD(mPosition), SCULK_FORMAT_FIELD(mReaction));
 }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/LevelEventGenericPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void LevelEventGenericPacket::write(BinaryStream& stream) const {
 Result<> LevelEventGenericPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVarInt(mEventId));
     return mData.deserialize(stream);
+}
+
+std::string LevelEventGenericPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mEventId), SCULK_FORMAT_FIELD(mData));
 }
 
 } // namespace sculk::protocol::inline abi_v975

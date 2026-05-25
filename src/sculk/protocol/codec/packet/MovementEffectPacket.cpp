@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MovementEffectPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,15 @@ Result<> MovementEffectPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mEffectId, &ReadOnlyBinaryStream::readVarInt));
     _SCULK_READ(stream.readVarInt(mEffectDuration));
     return stream.readUnsignedVarInt64(mTick);
+}
+
+std::string MovementEffectPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mEffectId),
+        SCULK_FORMAT_FIELD(mEffectDuration),
+        SCULK_FORMAT_FIELD(mTick)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

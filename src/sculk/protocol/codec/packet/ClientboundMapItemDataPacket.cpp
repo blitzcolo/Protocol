@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientboundMapItemDataPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -64,6 +65,25 @@ Result<> ClientboundMapItemDataPacket::read(ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readArray(mPixels, &ReadOnlyBinaryStream::readUnsignedVarInt));
     }
     return {};
+}
+
+std::string ClientboundMapItemDataPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mMapId),
+        SCULK_FORMAT_FIELD(mTypeFlag),
+        SCULK_FORMAT_FIELD(mDimension),
+        SCULK_FORMAT_FIELD(mIsLockedMap),
+        SCULK_FORMAT_FIELD(mMapOrigin),
+        SCULK_FORMAT_FIELD(mMapEntries),
+        SCULK_FORMAT_FIELD(mScale),
+        SCULK_FORMAT_FIELD(mTrackedActors),
+        SCULK_FORMAT_FIELD(mDecorationList),
+        SCULK_FORMAT_FIELD(mTextureWidth),
+        SCULK_FORMAT_FIELD(mTextureHeight),
+        SCULK_FORMAT_FIELD(mXTexCoordinate),
+        SCULK_FORMAT_FIELD(mYTexCoordinate),
+        SCULK_FORMAT_FIELD(mPixels)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

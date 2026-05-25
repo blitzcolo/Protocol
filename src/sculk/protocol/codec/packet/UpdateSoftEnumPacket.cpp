@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdateSoftEnumPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> UpdateSoftEnumPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mEnumName));
     _SCULK_READ(stream.readArray(mEnumValues, &ReadOnlyBinaryStream::readString));
     return stream.readEnum(mUpdateType, &ReadOnlyBinaryStream::readByte);
+}
+
+std::string UpdateSoftEnumPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mEnumName),
+        SCULK_FORMAT_FIELD(mEnumValues),
+        SCULK_FORMAT_FIELD(mUpdateType)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

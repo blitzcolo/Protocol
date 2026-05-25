@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdateClientInputLocksPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void UpdateClientInputLocksPacket::write(BinaryStream& stream) const {
 
 Result<> UpdateClientInputLocksPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readUnsignedVarInt(mInputLockComponentData);
+}
+
+std::string UpdateClientInputLocksPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mInputLockComponentData));
 }
 
 } // namespace sculk::protocol::inline abi_v975

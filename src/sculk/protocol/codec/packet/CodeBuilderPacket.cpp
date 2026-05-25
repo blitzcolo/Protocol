@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CodeBuilderPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void CodeBuilderPacket::write(BinaryStream& stream) const {
 Result<> CodeBuilderPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mUrl));
     return stream.readBool(mShouldOpen);
+}
+
+std::string CodeBuilderPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mUrl), SCULK_FORMAT_FIELD(mShouldOpen));
 }
 
 } // namespace sculk::protocol::inline abi_v975

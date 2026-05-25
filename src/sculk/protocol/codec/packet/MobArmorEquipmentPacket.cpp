@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MobArmorEquipmentPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -29,6 +30,17 @@ Result<> MobArmorEquipmentPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mLegs.read(stream));
     _SCULK_READ(mFeet.read(stream));
     return mBody.read(stream);
+}
+
+std::string MobArmorEquipmentPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mRuntimeId),
+        SCULK_FORMAT_FIELD(mHead),
+        SCULK_FORMAT_FIELD(mTorso),
+        SCULK_FORMAT_FIELD(mLegs),
+        SCULK_FORMAT_FIELD(mFeet),
+        SCULK_FORMAT_FIELD(mBody)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

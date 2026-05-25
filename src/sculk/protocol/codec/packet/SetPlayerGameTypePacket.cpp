@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetPlayerGameTypePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -20,5 +21,7 @@ void SetPlayerGameTypePacket::write(BinaryStream& stream) const {
 Result<> SetPlayerGameTypePacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt);
 }
+
+std::string SetPlayerGameTypePacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mGameType)); }
 
 } // namespace sculk::protocol::inline abi_v975

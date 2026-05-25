@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PartyChangedPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -30,5 +31,7 @@ void PartyChangedPacket::write(BinaryStream& stream) const {
 Result<> PartyChangedPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readOptional(mPlayerPartyInfo, &PlayerPartyInfo::read);
 }
+
+std::string PartyChangedPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mPlayerPartyInfo)); }
 
 } // namespace sculk::protocol::inline abi_v975

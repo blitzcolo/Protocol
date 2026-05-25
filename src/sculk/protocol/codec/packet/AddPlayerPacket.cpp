@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AddPlayerPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -49,6 +50,27 @@ Result<> AddPlayerPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readArray(mActorLinks, &ActorLink::read));
     _SCULK_READ(stream.readString(mDeviceId));
     return stream.readUnsignedInt(mBuildPlatform);
+}
+
+std::string AddPlayerPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mActorLinks),
+        SCULK_FORMAT_FIELD(mName),
+        SCULK_FORMAT_FIELD(mUuid),
+        SCULK_FORMAT_FIELD(mPlatformOnlineId),
+        SCULK_FORMAT_FIELD(mPos),
+        SCULK_FORMAT_FIELD(mVelocity),
+        SCULK_FORMAT_FIELD(mRot),
+        SCULK_FORMAT_FIELD(mYHeadRot),
+        SCULK_FORMAT_FIELD(mAbilities),
+        SCULK_FORMAT_FIELD(mDeviceId),
+        SCULK_FORMAT_FIELD(mBuildPlatform),
+        SCULK_FORMAT_FIELD(mGameType),
+        SCULK_FORMAT_FIELD(mCarriedItem),
+        SCULK_FORMAT_FIELD(mMetaData),
+        SCULK_FORMAT_FIELD(mSynchedProperties)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

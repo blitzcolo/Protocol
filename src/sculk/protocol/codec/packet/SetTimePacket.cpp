@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetTimePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view SetTimePacket::getName() const noexcept { return "SetTimePacket
 void SetTimePacket::write(BinaryStream& stream) const { stream.writeVarInt(mTime); }
 
 Result<> SetTimePacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt(mTime); }
+
+std::string SetTimePacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mTime)); }
 
 } // namespace sculk::protocol::inline abi_v975

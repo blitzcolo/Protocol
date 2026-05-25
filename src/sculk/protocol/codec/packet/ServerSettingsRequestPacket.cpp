@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ServerSettingsRequestPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -18,5 +19,7 @@ std::string_view ServerSettingsRequestPacket::getName() const noexcept { return 
 void ServerSettingsRequestPacket::write(BinaryStream&) const {}
 
 Result<> ServerSettingsRequestPacket::read(ReadOnlyBinaryStream&) { return {}; }
+
+std::string ServerSettingsRequestPacket::toString() const { return SCULK_FORMAT_PACKET(); }
 
 } // namespace sculk::protocol::inline abi_v975

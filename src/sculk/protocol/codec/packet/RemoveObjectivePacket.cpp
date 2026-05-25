@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/RemoveObjectivePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view RemoveObjectivePacket::getName() const noexcept { return "Remov
 void RemoveObjectivePacket::write(BinaryStream& stream) const { stream.writeString(mObjectiveName); }
 
 Result<> RemoveObjectivePacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mObjectiveName); }
+
+std::string RemoveObjectivePacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mObjectiveName)); }
 
 } // namespace sculk::protocol::inline abi_v975

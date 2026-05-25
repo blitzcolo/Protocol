@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerAuthInputPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -71,6 +72,30 @@ Result<> PlayerAuthInputPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mAnologMoveVector.read(stream));
     _SCULK_READ(mCameraOrientation.read(stream));
     return mRawMoveVector.read(stream);
+}
+
+std::string PlayerAuthInputPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPlayerRotation),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mMoveVector),
+        SCULK_FORMAT_FIELD(mPlayerHeadRotation),
+        SCULK_FORMAT_FIELD(mInputData),
+        SCULK_FORMAT_FIELD(mInputType),
+        SCULK_FORMAT_FIELD(mPlayMode),
+        SCULK_FORMAT_FIELD(mNewInteractionModel),
+        SCULK_FORMAT_FIELD(mInteractRotation),
+        SCULK_FORMAT_FIELD(mClientTick),
+        SCULK_FORMAT_FIELD(mPosDelta),
+        SCULK_FORMAT_FIELD(mItemUseTransaction),
+        SCULK_FORMAT_FIELD(mItemStackRequestData),
+        SCULK_FORMAT_FIELD(mPlayerBlockActions),
+        SCULK_FORMAT_FIELD(mVehicleRotation),
+        SCULK_FORMAT_FIELD(mClientPredictedVihicle),
+        SCULK_FORMAT_FIELD(mAnologMoveVector),
+        SCULK_FORMAT_FIELD(mCameraOrientation),
+        SCULK_FORMAT_FIELD(mRawMoveVector)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

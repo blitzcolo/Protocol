@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PhotoTransferPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -31,6 +32,18 @@ Result<> PhotoTransferPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mSourceType, &ReadOnlyBinaryStream::readByte));
     _SCULK_READ(stream.readSignedInt64(mOwnerId));
     return stream.readString(mNewPhotoName);
+}
+
+std::string PhotoTransferPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPhotoName),
+        SCULK_FORMAT_FIELD(mPhotoData),
+        SCULK_FORMAT_FIELD(mBookId),
+        SCULK_FORMAT_FIELD(mType),
+        SCULK_FORMAT_FIELD(mSourceType),
+        SCULK_FORMAT_FIELD(mOwnerId),
+        SCULK_FORMAT_FIELD(mNewPhotoName)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

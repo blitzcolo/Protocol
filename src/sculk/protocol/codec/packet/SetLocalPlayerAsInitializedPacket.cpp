@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetLocalPlayerAsInitializedPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void SetLocalPlayerAsInitializedPacket::write(BinaryStream& stream) const { stre
 
 Result<> SetLocalPlayerAsInitializedPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readUnsignedVarInt64(mRuntimeId);
+}
+
+std::string SetLocalPlayerAsInitializedPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mRuntimeId));
 }
 
 } // namespace sculk::protocol::inline abi_v975

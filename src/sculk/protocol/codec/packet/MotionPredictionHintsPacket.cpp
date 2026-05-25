@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MotionPredictionHintsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,14 @@ Result<> MotionPredictionHintsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt64(mActorRuntimeId));
     _SCULK_READ(mMotion.read(stream));
     return stream.readBool(mOnGround);
+}
+
+std::string MotionPredictionHintsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mMotion),
+        SCULK_FORMAT_FIELD(mOnGround)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

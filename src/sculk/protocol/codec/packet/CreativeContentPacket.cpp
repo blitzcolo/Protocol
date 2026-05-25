@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CreativeContentPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -45,6 +46,10 @@ void CreativeContentPacket::write(BinaryStream& stream) const {
 Result<> CreativeContentPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readArray(mGroups, &Group::read));
     return stream.readArray(mWriteEntries, &WriteEntry::read);
+}
+
+std::string CreativeContentPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mWriteEntries), SCULK_FORMAT_FIELD(mGroups));
 }
 
 } // namespace sculk::protocol::inline abi_v975

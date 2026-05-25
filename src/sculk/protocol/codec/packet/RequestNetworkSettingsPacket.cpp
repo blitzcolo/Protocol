@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/RequestNetworkSettingsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void RequestNetworkSettingsPacket::write(BinaryStream& stream) const {
 
 Result<> RequestNetworkSettingsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readSignedBigEndianInt(mClientNetworkVersion);
+}
+
+std::string RequestNetworkSettingsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mClientNetworkVersion));
 }
 
 } // namespace sculk::protocol::inline abi_v975

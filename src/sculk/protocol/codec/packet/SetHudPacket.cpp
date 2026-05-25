@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetHudPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,10 @@ Result<> SetHudPacket::read(ReadOnlyBinaryStream& stream) {
         return stream.readEnum(element, &ReadOnlyBinaryStream::readVarInt);
     }));
     return stream.readEnum(mHudVisibility, &ReadOnlyBinaryStream::readVarInt);
+}
+
+std::string SetHudPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mHudElements), SCULK_FORMAT_FIELD(mHudVisibility));
 }
 
 } // namespace sculk::protocol::inline abi_v975

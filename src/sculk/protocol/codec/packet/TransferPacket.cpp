@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/TransferPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> TransferPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mServerAddress));
     _SCULK_READ(stream.readUnsignedShort(mServerPort));
     return stream.readBool(mReloadWorld);
+}
+
+std::string TransferPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mServerAddress),
+        SCULK_FORMAT_FIELD(mServerPort),
+        SCULK_FORMAT_FIELD(mReloadWorld)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

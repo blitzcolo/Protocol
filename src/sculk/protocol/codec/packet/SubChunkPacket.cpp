@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SubChunkPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -96,6 +97,14 @@ Result<> SubChunkPacket::read(ReadOnlyBinaryStream& stream) {
         _SCULK_READ(data.read(stream, mCacheEnabled));
     }
     return {};
+}
+
+std::string SubChunkPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mDimensionType),
+        SCULK_FORMAT_FIELD(mSubChunkData),
+        SCULK_FORMAT_FIELD(mCenterPos)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

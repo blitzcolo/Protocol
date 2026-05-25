@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/HurtArmorPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> HurtArmorPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mCause, &ReadOnlyBinaryStream::readVarInt));
     _SCULK_READ(stream.readVarInt(mDamage));
     return stream.readUnsignedVarInt64(mArmorSlots);
+}
+
+std::string HurtArmorPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mCause),
+        SCULK_FORMAT_FIELD(mDamage),
+        SCULK_FORMAT_FIELD(mArmorSlots)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

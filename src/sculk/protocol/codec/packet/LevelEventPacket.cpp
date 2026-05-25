@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/LevelEventPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> LevelEventPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVarInt(mEventType));
     _SCULK_READ(mPosition.read(stream));
     return stream.readVarInt(mEventData);
+}
+
+std::string LevelEventPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mEventType),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mEventData)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

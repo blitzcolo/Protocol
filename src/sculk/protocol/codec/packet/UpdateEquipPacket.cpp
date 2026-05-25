@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdateEquipPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,16 @@ Result<> UpdateEquipPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readVarInt(mSize));
     _SCULK_READ(stream.readVarInt64(mEntityUniqueId));
     return mTag.read(stream);
+}
+
+std::string UpdateEquipPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mContainerId),
+        SCULK_FORMAT_FIELD(mContainerType),
+        SCULK_FORMAT_FIELD(mSize),
+        SCULK_FORMAT_FIELD(mEntityUniqueId),
+        SCULK_FORMAT_FIELD(mTag)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

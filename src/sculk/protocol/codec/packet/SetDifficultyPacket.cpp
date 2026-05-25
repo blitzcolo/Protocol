@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetDifficultyPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view SetDifficultyPacket::getName() const noexcept { return "SetDiff
 void SetDifficultyPacket::write(BinaryStream& stream) const { stream.writeUnsignedVarInt(mDifficulty); }
 
 Result<> SetDifficultyPacket::read(ReadOnlyBinaryStream& stream) { return stream.readUnsignedVarInt(mDifficulty); }
+
+std::string SetDifficultyPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mDifficulty)); }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/GameTestResultsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> GameTestResultsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mSucceeded));
     _SCULK_READ(stream.readString(mError));
     return stream.readString(mTestName);
+}
+
+std::string GameTestResultsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mSucceeded),
+        SCULK_FORMAT_FIELD(mError),
+        SCULK_FORMAT_FIELD(mTestName)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

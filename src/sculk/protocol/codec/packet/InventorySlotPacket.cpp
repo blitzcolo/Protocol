@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/InventorySlotPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,16 @@ Result<> InventorySlotPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readOptional(mFullContainerName, &FullContainerName::read));
     _SCULK_READ(stream.readOptional(mStorageItem, &NetworkItemStackDescriptor::readCereal));
     return mItem.readCereal(stream);
+}
+
+std::string InventorySlotPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mInventoryId),
+        SCULK_FORMAT_FIELD(mSlot),
+        SCULK_FORMAT_FIELD(mFullContainerName),
+        SCULK_FORMAT_FIELD(mStorageItem),
+        SCULK_FORMAT_FIELD(mItem)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

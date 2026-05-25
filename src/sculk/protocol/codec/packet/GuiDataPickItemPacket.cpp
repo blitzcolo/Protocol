@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/GuiDataPickItemPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> GuiDataPickItemPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mItemName));
     _SCULK_READ(stream.readString(mItemEffectName));
     return stream.readSignedInt(mSlot);
+}
+
+std::string GuiDataPickItemPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mItemName),
+        SCULK_FORMAT_FIELD(mItemEffectName),
+        SCULK_FORMAT_FIELD(mSlot)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

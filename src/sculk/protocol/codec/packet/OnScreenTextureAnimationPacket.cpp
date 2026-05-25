@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/OnScreenTextureAnimationPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -19,6 +20,10 @@ void OnScreenTextureAnimationPacket::write(BinaryStream& stream) const { stream.
 
 Result<> OnScreenTextureAnimationPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readUnsignedInt(mEffectId);
+}
+
+std::string OnScreenTextureAnimationPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mEffectId));
 }
 
 } // namespace sculk::protocol::inline abi_v975

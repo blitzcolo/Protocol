@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdateAdventureSettingsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -29,6 +30,16 @@ Result<> UpdateAdventureSettingsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readBool(mImmutableWorld));
     _SCULK_READ(stream.readBool(mShowNameTags));
     return stream.readBool(mAutoJump);
+}
+
+std::string UpdateAdventureSettingsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mNoPvM),
+        SCULK_FORMAT_FIELD(mNoMvP),
+        SCULK_FORMAT_FIELD(mImmutableWorld),
+        SCULK_FORMAT_FIELD(mShowNameTags),
+        SCULK_FORMAT_FIELD(mAutoJump)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

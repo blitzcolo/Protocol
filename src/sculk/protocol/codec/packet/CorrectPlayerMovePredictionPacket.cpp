@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CorrectPlayerMovePredictionPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -35,6 +36,18 @@ Result<> CorrectPlayerMovePredictionPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readOptional(mVehicleAngularVelocity, &ReadOnlyBinaryStream::readFloat));
     _SCULK_READ(stream.readBool(mOnGround));
     return stream.readUnsignedVarInt64(mPlayerInputTick);
+}
+
+std::string CorrectPlayerMovePredictionPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPredictionType),
+        SCULK_FORMAT_FIELD(mPos),
+        SCULK_FORMAT_FIELD(mPosDelta),
+        SCULK_FORMAT_FIELD(mVehiclePrediction),
+        SCULK_FORMAT_FIELD(mVehicleAngularVelocity),
+        SCULK_FORMAT_FIELD(mOnGround),
+        SCULK_FORMAT_FIELD(mPlayerInputTick)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

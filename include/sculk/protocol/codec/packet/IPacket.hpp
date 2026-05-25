@@ -9,6 +9,7 @@
 #include "sculk/protocol/codec/MinecraftPacketIds.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
+#include <format>
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -31,6 +32,8 @@ public:
 
     [[nodiscard]] virtual Result<> read(ReadOnlyBinaryStream& stream) = 0;
 
+    [[nodiscard]] virtual std::string toString() const { return std::string(getName()); }
+
     void writeHeader(BinaryStream& stream) const;
 
     [[nodiscard]] Result<> readHeader(ReadOnlyBinaryStream& stream);
@@ -41,3 +44,20 @@ public:
 };
 
 } // namespace sculk::protocol::inline abi_v975
+
+template <>
+struct std::formatter<sculk::protocol::abi_v975::IPacket> : std::formatter<std::string> {
+    auto format(const sculk::protocol::abi_v975::IPacket& packet, format_context& ctx) const {
+        return std::formatter<std::string>::format(packet.toString(), ctx);
+    }
+};
+
+#if __has_include(<fmt/format.h>)
+#include <fmt/format.h>
+template <>
+struct fmt::formatter<sculk::protocol::abi_v975::IPacket> : fmt::formatter<std::string> {
+    auto format(const sculk::protocol::abi_v975::IPacket& packet, fmt::format_context& ctx) const {
+        return fmt::formatter<std::string>::format(packet.toString(), ctx);
+    }
+};
+#endif

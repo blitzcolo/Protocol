@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientboundDataDrivenUICloseAllScreensPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,10 @@ void ClientboundDataDrivenUICloseAllScreensPacket::write(BinaryStream& stream) c
 
 Result<> ClientboundDataDrivenUICloseAllScreensPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readOptional(mFormId, &ReadOnlyBinaryStream::readUnsignedInt);
+}
+
+std::string ClientboundDataDrivenUICloseAllScreensPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mFormId));
 }
 
 } // namespace sculk::protocol::inline abi_v975

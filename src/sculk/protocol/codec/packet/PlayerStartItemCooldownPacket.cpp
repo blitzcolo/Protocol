@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerStartItemCooldownPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,10 @@ void PlayerStartItemCooldownPacket::write(BinaryStream& stream) const {
 Result<> PlayerStartItemCooldownPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mItemCategory));
     return stream.readVarInt(mDurationTicks);
+}
+
+std::string PlayerStartItemCooldownPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mItemCategory), SCULK_FORMAT_FIELD(mDurationTicks));
 }
 
 } // namespace sculk::protocol::inline abi_v975

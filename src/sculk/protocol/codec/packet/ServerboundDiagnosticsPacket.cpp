@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ServerboundDiagnosticsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -80,6 +81,23 @@ Result<> ServerboundDiagnosticsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readArray(mMemoryCategoryValues, &MemoryCategoryCounter::read));
     _SCULK_READ(stream.readArray(mEntityDiagnostics, &EntityDiagnosticTimingInfo::read));
     return stream.readArray(mSystemDiagnostics, &SystemDiagnosticTimingInfo::read);
+}
+
+std::string ServerboundDiagnosticsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mAvgFps),
+        SCULK_FORMAT_FIELD(mAvgServerSimTickTimeMS),
+        SCULK_FORMAT_FIELD(mAvgClientSimTickTimeMS),
+        SCULK_FORMAT_FIELD(mAvgBeginFrameTimeMS),
+        SCULK_FORMAT_FIELD(mAvgInputTimeMS),
+        SCULK_FORMAT_FIELD(mAvgRenderTimeMS),
+        SCULK_FORMAT_FIELD(mAvgEndFrameTimeMS),
+        SCULK_FORMAT_FIELD(mAvgRemainderTimePercent),
+        SCULK_FORMAT_FIELD(mAvgUnaccountedTimePercent),
+        SCULK_FORMAT_FIELD(mMemoryCategoryValues),
+        SCULK_FORMAT_FIELD(mEntityDiagnostics),
+        SCULK_FORMAT_FIELD(mSystemDiagnostics)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

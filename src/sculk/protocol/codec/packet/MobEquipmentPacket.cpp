@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MobEquipmentPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,16 @@ Result<> MobEquipmentPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readByte(mSlotByte));
     _SCULK_READ(stream.readByte(mSelectedSlotByte));
     return stream.readByte(mContainerIdByte);
+}
+
+std::string MobEquipmentPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mRuntimeId),
+        SCULK_FORMAT_FIELD(mItem),
+        SCULK_FORMAT_FIELD(mSlotByte),
+        SCULK_FORMAT_FIELD(mSelectedSlotByte),
+        SCULK_FORMAT_FIELD(mContainerIdByte)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

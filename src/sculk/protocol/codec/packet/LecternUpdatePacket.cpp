@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/LecternUpdatePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> LecternUpdatePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readByte(mNewPageToShow));
     _SCULK_READ(stream.readByte(mTotalPages));
     return mPosition.read(stream);
+}
+
+std::string LecternUpdatePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mNewPageToShow),
+        SCULK_FORMAT_FIELD(mTotalPages),
+        SCULK_FORMAT_FIELD(mPosition)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

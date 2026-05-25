@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AgentActionEventPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> AgentActionEventPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mRequestId));
     _SCULK_READ(stream.readEnum(mAction, &ReadOnlyBinaryStream::readSignedInt));
     return stream.readString(mResponse);
+}
+
+std::string AgentActionEventPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mRequestId),
+        SCULK_FORMAT_FIELD(mAction),
+        SCULK_FORMAT_FIELD(mResponse)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

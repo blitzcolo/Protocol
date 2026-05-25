@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AnvilDamagePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void AnvilDamagePacket::write(BinaryStream& stream) const {
 Result<> AnvilDamagePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readByte(mDamageAmount));
     return mPosition.read(stream);
+}
+
+std::string AnvilDamagePacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mDamageAmount), SCULK_FORMAT_FIELD(mPosition));
 }
 
 } // namespace sculk::protocol::inline abi_v975

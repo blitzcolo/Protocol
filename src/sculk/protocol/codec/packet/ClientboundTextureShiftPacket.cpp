@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientboundTextureShiftPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -35,6 +36,19 @@ Result<> ClientboundTextureShiftPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt64(mCurrentLengthInTicks));
     _SCULK_READ(stream.readUnsignedVarInt64(mTotalLengthInTicks));
     return stream.readBool(mIsEnabled);
+}
+
+std::string ClientboundTextureShiftPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActionType),
+        SCULK_FORMAT_FIELD(mCollectionName),
+        SCULK_FORMAT_FIELD(mFromStep),
+        SCULK_FORMAT_FIELD(mToStep),
+        SCULK_FORMAT_FIELD(mAllSteps),
+        SCULK_FORMAT_FIELD(mCurrentLengthInTicks),
+        SCULK_FORMAT_FIELD(mTotalLengthInTicks),
+        SCULK_FORMAT_FIELD(mIsEnabled)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

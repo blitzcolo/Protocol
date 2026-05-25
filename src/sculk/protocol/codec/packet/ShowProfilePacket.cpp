@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ShowProfilePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view ShowProfilePacket::getName() const noexcept { return "ShowProfi
 void ShowProfilePacket::write(BinaryStream& stream) const { stream.writeString(mXuid); }
 
 Result<> ShowProfilePacket::read(ReadOnlyBinaryStream& stream) { return stream.readString(mXuid); }
+
+std::string ShowProfilePacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mXuid)); }
 
 } // namespace sculk::protocol::inline abi_v975

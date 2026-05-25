@@ -78,7 +78,8 @@ using ParamPtr    = std::unique_ptr<OSSL_PARAM, OsslParamDeleter>;
 }
 
 [[nodiscard]] inline bool isRs256Key(const EVP_PKEY* key) {
-    return key && EVP_PKEY_base_id(key) == EVP_PKEY_RSA && EVP_PKEY_get_bits(key) >= MinRsaBits;
+    return key && EVP_PKEY_base_id(key) == EVP_PKEY_RSA
+        && static_cast<std::size_t>(EVP_PKEY_get_bits(key)) >= MinRsaBits;
 }
 
 [[nodiscard]] inline MdCtxPtr makeMdCtx() { return MdCtxPtr(EVP_MD_CTX_new(), EVP_MD_CTX_free); }

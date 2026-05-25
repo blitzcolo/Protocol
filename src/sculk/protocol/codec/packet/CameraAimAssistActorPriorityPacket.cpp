@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CameraAimAssistActorPriorityPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,10 @@ void CameraAimAssistActorPriorityPacket::write(BinaryStream& stream) const {
 
 Result<> CameraAimAssistActorPriorityPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mCameraAimAssistActorPriorityList, &AimAssistActorPriorityData::read);
+}
+
+std::string CameraAimAssistActorPriorityPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mCameraAimAssistActorPriorityList));
 }
 
 } // namespace sculk::protocol::inline abi_v975

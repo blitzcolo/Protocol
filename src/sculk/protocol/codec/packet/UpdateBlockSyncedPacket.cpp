@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdateBlockSyncedPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -29,6 +30,17 @@ Result<> UpdateBlockSyncedPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedVarInt(mLayer));
     _SCULK_READ(stream.readUnsignedVarInt64(mUniqueActorId));
     return stream.readUnsignedVarInt64(mActorSyncMessage);
+}
+
+std::string UpdateBlockSyncedPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mBlockPosition),
+        SCULK_FORMAT_FIELD(mRuntimeId),
+        SCULK_FORMAT_FIELD(mFlag),
+        SCULK_FORMAT_FIELD(mLayer),
+        SCULK_FORMAT_FIELD(mUniqueActorId),
+        SCULK_FORMAT_FIELD(mActorSyncMessage)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

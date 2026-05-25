@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/TextPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -59,6 +60,17 @@ Result<> TextPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mXuid));
     _SCULK_READ(stream.readString(mPlatformId));
     return stream.readString(mFilteredMessage);
+}
+
+std::string TextPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mLocalize),
+        SCULK_FORMAT_FIELD(mType),
+        SCULK_FORMAT_FIELD(mBody),
+        SCULK_FORMAT_FIELD(mXuid),
+        SCULK_FORMAT_FIELD(mPlatformId),
+        SCULK_FORMAT_FIELD(mFilteredMessage)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

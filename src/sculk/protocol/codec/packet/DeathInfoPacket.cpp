@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/DeathInfoPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void DeathInfoPacket::write(BinaryStream& stream) const {
 Result<> DeathInfoPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mDeathCauseAttackName));
     return stream.readArray(mDeathCauseMessageList, &ReadOnlyBinaryStream::readString);
+}
+
+std::string DeathInfoPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mDeathCauseAttackName), SCULK_FORMAT_FIELD(mDeathCauseMessageList));
 }
 
 } // namespace sculk::protocol::inline abi_v975

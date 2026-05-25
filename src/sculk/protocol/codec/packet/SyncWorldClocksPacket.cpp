@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SyncWorldClocksPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -50,5 +51,7 @@ Result<> SyncWorldClocksPacket::read(ReadOnlyBinaryStream& stream) {
         mData
     );
 }
+
+std::string SyncWorldClocksPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mData)); }
 
 } // namespace sculk::protocol::inline abi_v975

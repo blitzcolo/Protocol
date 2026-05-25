@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlaySoundPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,16 @@ Result<> PlaySoundPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readFloat(mVolume));
     _SCULK_READ(stream.readFloat(mPitch));
     return stream.readOptional(mServerSoundHandle, &ReadOnlyBinaryStream::readUnsignedInt64);
+}
+
+std::string PlaySoundPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mName),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mVolume),
+        SCULK_FORMAT_FIELD(mPitch),
+        SCULK_FORMAT_FIELD(mServerSoundHandle)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/TickingAreasLoadStatusPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -19,6 +20,10 @@ void TickingAreasLoadStatusPacket::write(BinaryStream& stream) const { stream.wr
 
 Result<> TickingAreasLoadStatusPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readBool(mWaitingForPreload);
+}
+
+std::string TickingAreasLoadStatusPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mWaitingForPreload));
 }
 
 } // namespace sculk::protocol::inline abi_v975

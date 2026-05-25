@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/LocatorBarPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -20,5 +21,7 @@ void LocatorBarPacket::write(BinaryStream& stream) const {
 Result<> LocatorBarPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mWaypoints, &LocatorBarWaypointPayload::read);
 }
+
+std::string LocatorBarPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mWaypoints)); }
 
 } // namespace sculk::protocol::inline abi_v975

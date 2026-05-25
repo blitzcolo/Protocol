@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/StopSoundPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> StopSoundPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mSoundName));
     _SCULK_READ(stream.readBool(mStopAllSounds));
     return stream.readBool(mStopLegacyMusic);
+}
+
+std::string StopSoundPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mSoundName),
+        SCULK_FORMAT_FIELD(mStopAllSounds),
+        SCULK_FORMAT_FIELD(mStopLegacyMusic)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

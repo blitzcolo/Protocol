@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/StructureBlockUpdatePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,10 @@ Result<> StructureBlockUpdatePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mStructureData.read(stream));
     _SCULK_READ(stream.readBool(mTrigger));
     return stream.readBool(mIsWaterLogged);
+}
+
+std::string StructureBlockUpdatePacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mBlockPosition), SCULK_FORMAT_FIELD(mStructureData));
 }
 
 } // namespace sculk::protocol::inline abi_v975

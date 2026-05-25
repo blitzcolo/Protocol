@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/UpdatePlayerGameTypePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,14 @@ Result<> UpdatePlayerGameTypePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mGameType, &ReadOnlyBinaryStream::readVarInt));
     _SCULK_READ(stream.readVarInt64(mPlayerUniqueId));
     return stream.readUnsignedVarInt64(mTick);
+}
+
+std::string UpdatePlayerGameTypePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mGameType),
+        SCULK_FORMAT_FIELD(mPlayerUniqueId),
+        SCULK_FORMAT_FIELD(mTick)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

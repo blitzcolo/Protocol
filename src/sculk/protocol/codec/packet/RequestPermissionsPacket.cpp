@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/RequestPermissionsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> RequestPermissionsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readSignedInt64(mPlayerRawId));
     _SCULK_READ(stream.readVarInt(mPermissionLevel));
     return stream.readUnsignedShort(mCustomPermissionFlag);
+}
+
+std::string RequestPermissionsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPlayerRawId),
+        SCULK_FORMAT_FIELD(mPermissionLevel),
+        SCULK_FORMAT_FIELD(mCustomPermissionFlag)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

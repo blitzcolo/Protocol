@@ -7,6 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ServerboundDataDrivenScreenClosedPacket.hpp"
 #include "../utility/EnumName.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -26,6 +27,10 @@ void ServerboundDataDrivenScreenClosedPacket::write(BinaryStream& stream) const 
 Result<> ServerboundDataDrivenScreenClosedPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readOptional(mFormId, &ReadOnlyBinaryStream::readUnsignedInt));
     return utils::readEnumName(stream, mCloseReason);
+}
+
+std::string ServerboundDataDrivenScreenClosedPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mFormId), SCULK_FORMAT_FIELD(mCloseReason));
 }
 
 } // namespace sculk::protocol::inline abi_v975

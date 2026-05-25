@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientboundControlSchemeSetPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,10 @@ void ClientboundControlSchemeSetPacket::write(BinaryStream& stream) const {
 
 Result<> ClientboundControlSchemeSetPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readEnum(mControlScheme, &ReadOnlyBinaryStream::readByte);
+}
+
+std::string ClientboundControlSchemeSetPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mControlScheme));
 }
 
 } // namespace sculk::protocol::inline abi_v975

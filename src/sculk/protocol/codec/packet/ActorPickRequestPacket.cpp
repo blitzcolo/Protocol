@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ActorPickRequestPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> ActorPickRequestPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readSignedInt64(mActorId));
     _SCULK_READ(stream.readByte(mMaxSlots));
     return stream.readBool(mWithData);
+}
+
+std::string ActorPickRequestPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorId),
+        SCULK_FORMAT_FIELD(mMaxSlots),
+        SCULK_FORMAT_FIELD(mWithData)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

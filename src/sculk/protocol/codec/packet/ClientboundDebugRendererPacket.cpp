@@ -7,6 +7,7 @@
 
 #include "sculk/protocol/codec/packet/ClientboundDebugRendererPacket.hpp"
 #include "../utility/EnumName.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -38,6 +39,10 @@ void ClientboundDebugRendererPacket::write(BinaryStream& stream) const {
 Result<> ClientboundDebugRendererPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(utils::readEnumName(stream, mType));
     return stream.readOptional(mDebugMarkerData, &DebugMarkerData::read);
+}
+
+std::string ClientboundDebugRendererPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mType), SCULK_FORMAT_FIELD(mDebugMarkerData));
 }
 
 } // namespace sculk::protocol::inline abi_v975

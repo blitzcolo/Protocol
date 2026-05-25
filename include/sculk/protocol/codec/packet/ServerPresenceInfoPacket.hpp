@@ -24,6 +24,8 @@ public:
     void write(BinaryStream& stream) const override;
 
     [[nodiscard]] Result<> read(ReadOnlyBinaryStream& stream) override;
+
+    [[nodiscard]] std::string toString() const override;
 };
 
 } // namespace sculk::protocol::inline abi_v975

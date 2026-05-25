@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ActorEventPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,15 @@ Result<> ActorEventPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mEventId, &ReadOnlyBinaryStream::readByte));
     _SCULK_READ(stream.readVarInt(mData));
     return stream.readOptional(mFireAtPosition, &Vec3::read);
+}
+
+std::string ActorEventPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mRuntimeId),
+        SCULK_FORMAT_FIELD(mEventId),
+        SCULK_FORMAT_FIELD(mData),
+        SCULK_FORMAT_FIELD(mFireAtPosition)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

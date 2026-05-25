@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/RespawnPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> RespawnPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mPosition.read(stream));
     _SCULK_READ(stream.readEnum(mState, &ReadOnlyBinaryStream::readByte));
     return stream.readUnsignedVarInt64(mActorRuntimeId);
+}
+
+std::string RespawnPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mState),
+        SCULK_FORMAT_FIELD(mActorRuntimeId)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

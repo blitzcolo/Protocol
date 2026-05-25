@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ChangeMobPropertyPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -29,6 +30,17 @@ Result<> ChangeMobPropertyPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mStringValue));
     _SCULK_READ(stream.readVarInt(mIntValue));
     return stream.readFloat(mFloatValue);
+}
+
+std::string ChangeMobPropertyPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorUniqueId),
+        SCULK_FORMAT_FIELD(mPropertyName),
+        SCULK_FORMAT_FIELD(mBoolVaue),
+        SCULK_FORMAT_FIELD(mStringValue),
+        SCULK_FORMAT_FIELD(mIntValue),
+        SCULK_FORMAT_FIELD(mFloatValue)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

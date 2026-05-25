@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/BossEventPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -81,6 +82,20 @@ Result<> BossEventPacket::read(ReadOnlyBinaryStream& stream) {
     default:
         return {};
     }
+}
+
+std::string BossEventPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mTargetActor),
+        SCULK_FORMAT_FIELD(mPlayer),
+        SCULK_FORMAT_FIELD(mType),
+        SCULK_FORMAT_FIELD(mName),
+        SCULK_FORMAT_FIELD(mFilteredName),
+        SCULK_FORMAT_FIELD(mPercentage),
+        SCULK_FORMAT_FIELD(mDarkenScreen),
+        SCULK_FORMAT_FIELD(mColor),
+        SCULK_FORMAT_FIELD(mOverlay)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

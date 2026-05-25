@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ContainerSetDataPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -22,6 +23,10 @@ Result<> ContainerSetDataPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mContainerId, &ReadOnlyBinaryStream::readByte));
     _SCULK_READ(stream.readVarInt(mId));
     return stream.readVarInt(mValue);
+}
+
+std::string ContainerSetDataPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mContainerId), SCULK_FORMAT_FIELD(mId), SCULK_FORMAT_FIELD(mValue));
 }
 
 } // namespace sculk::protocol::inline abi_v975

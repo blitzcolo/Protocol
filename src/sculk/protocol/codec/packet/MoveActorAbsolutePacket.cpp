@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MoveActorAbsolutePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -31,6 +32,18 @@ Result<> MoveActorAbsolutePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readByte(mRotationY));
     _SCULK_READ(stream.readByte(mRotationYHead));
     return stream.readBool(mForceCompletion);
+}
+
+std::string MoveActorAbsolutePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mHeader),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mRotationX),
+        SCULK_FORMAT_FIELD(mRotationY),
+        SCULK_FORMAT_FIELD(mRotationYHead),
+        SCULK_FORMAT_FIELD(mForceCompletion)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

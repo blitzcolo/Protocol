@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/BlockPickRequestPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -23,6 +24,14 @@ Result<> BlockPickRequestPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mPosition.read(stream));
     _SCULK_READ(stream.readBool(mWithData));
     return stream.readByte(mMaxSlots);
+}
+
+std::string BlockPickRequestPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mWithData),
+        SCULK_FORMAT_FIELD(mMaxSlots)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

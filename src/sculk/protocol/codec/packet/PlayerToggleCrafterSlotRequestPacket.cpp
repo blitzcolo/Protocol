@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerToggleCrafterSlotRequestPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -31,6 +32,16 @@ Result<> PlayerToggleCrafterSlotRequestPacket::read(ReadOnlyBinaryStream& stream
     _SCULK_READ(stream.readSignedInt(mPosZ));
     _SCULK_READ(stream.readByte(mSlotIndex));
     return stream.readBool(mIsDisabled);
+}
+
+std::string PlayerToggleCrafterSlotRequestPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPosX),
+        SCULK_FORMAT_FIELD(mPosY),
+        SCULK_FORMAT_FIELD(mPosZ),
+        SCULK_FORMAT_FIELD(mSlotIndex),
+        SCULK_FORMAT_FIELD(mIsDisabled)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

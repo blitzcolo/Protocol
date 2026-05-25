@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ShowStoreOfferPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void ShowStoreOfferPacket::write(BinaryStream& stream) const {
 Result<> ShowStoreOfferPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mProductUuid));
     return stream.readEnum(mRedirectType, &ReadOnlyBinaryStream::readByte);
+}
+
+std::string ShowStoreOfferPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mProductUuid), SCULK_FORMAT_FIELD(mRedirectType));
 }
 
 } // namespace sculk::protocol::inline abi_v975

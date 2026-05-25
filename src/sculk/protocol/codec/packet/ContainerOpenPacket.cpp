@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ContainerOpenPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,15 @@ Result<> ContainerOpenPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readEnum(mContainerType, &ReadOnlyBinaryStream::readByte));
     _SCULK_READ(mPosition.read(stream));
     return stream.readVarInt64(mTargetActorId);
+}
+
+std::string ContainerOpenPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mContainerId),
+        SCULK_FORMAT_FIELD(mContainerType),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mTargetActorId)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

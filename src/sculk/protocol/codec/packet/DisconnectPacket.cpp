@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/DisconnectPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -30,6 +31,15 @@ Result<> DisconnectPacket::read(ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readString(mFilteredMessage));
     }
     return {};
+}
+
+std::string DisconnectPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mReason),
+        SCULK_FORMAT_FIELD(mSkipMessage),
+        SCULK_FORMAT_FIELD(mMessage),
+        SCULK_FORMAT_FIELD(mFilteredMessage)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

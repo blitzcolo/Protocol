@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/CameraPresetsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -18,5 +19,7 @@ void CameraPresetsPacket::write(BinaryStream& stream) const { stream.writeArray(
 Result<> CameraPresetsPacket::read(ReadOnlyBinaryStream& stream) {
     return stream.readArray(mPresets, &CameraPreset::read);
 }
+
+std::string CameraPresetsPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mPresets)); }
 
 } // namespace sculk::protocol::inline abi_v975

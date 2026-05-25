@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/BiomeDefinitionListPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void BiomeDefinitionListPacket::write(BinaryStream& stream) const {
 Result<> BiomeDefinitionListPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readArray(mBiomeNamesToDataMap, &BiomeData::read));
     return stream.readArray(mBiomeStringList, &ReadOnlyBinaryStream::readString);
+}
+
+std::string BiomeDefinitionListPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mBiomeNamesToDataMap), SCULK_FORMAT_FIELD(mBiomeStringList));
 }
 
 } // namespace sculk::protocol::inline abi_v975

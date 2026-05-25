@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AvailableCommandsPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -33,6 +34,19 @@ Result<> AvailableCommandsPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readArray(mCommands, &CommandData::read));
     _SCULK_READ(stream.readArray(mSoftEnums, &CommandSoftEnumData::read));
     return stream.readArray(mConstraints, &CommandConstrainedValueData::read);
+}
+
+std::string AvailableCommandsPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mEnumValues),
+        SCULK_FORMAT_FIELD(mChainedSubcommandsValues),
+        SCULK_FORMAT_FIELD(mPostFixes),
+        SCULK_FORMAT_FIELD(mEnumData),
+        SCULK_FORMAT_FIELD(mChainedSubcommandData),
+        SCULK_FORMAT_FIELD(mCommands),
+        SCULK_FORMAT_FIELD(mSoftEnums),
+        SCULK_FORMAT_FIELD(mConstraints)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

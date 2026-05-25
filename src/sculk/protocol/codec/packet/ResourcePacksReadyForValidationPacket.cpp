@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ResourcePacksReadyForValidationPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -20,5 +21,7 @@ std::string_view ResourcePacksReadyForValidationPacket::getName() const noexcept
 void ResourcePacksReadyForValidationPacket::write(BinaryStream&) const {}
 
 Result<> ResourcePacksReadyForValidationPacket::read(ReadOnlyBinaryStream&) { return {}; }
+
+std::string ResourcePacksReadyForValidationPacket::toString() const { return SCULK_FORMAT_PACKET(); }
 
 } // namespace sculk::protocol::inline abi_v975

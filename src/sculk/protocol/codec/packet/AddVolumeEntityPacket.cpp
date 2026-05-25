@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AddVolumeEntityPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -33,6 +34,19 @@ Result<> AddVolumeEntityPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mMaxBounds.read(stream));
     _SCULK_READ(stream.readVarInt(mDimensionType));
     return stream.readString(mEngineVersion);
+}
+
+std::string AddVolumeEntityPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mEntityNetId),
+        SCULK_FORMAT_FIELD(mComponents),
+        SCULK_FORMAT_FIELD(mJsonIdentifier),
+        SCULK_FORMAT_FIELD(mInstanceName),
+        SCULK_FORMAT_FIELD(mMinBounds),
+        SCULK_FORMAT_FIELD(mMaxBounds),
+        SCULK_FORMAT_FIELD(mDimensionType),
+        SCULK_FORMAT_FIELD(mEngineVersion)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ItemRegistryPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view ItemRegistryPacket::getName() const noexcept { return "ItemRegi
 void ItemRegistryPacket::write(BinaryStream& stream) const { stream.writeArray(mItemData, &ItemData::write); }
 
 Result<> ItemRegistryPacket::read(ReadOnlyBinaryStream& stream) { return stream.readArray(mItemData, &ItemData::read); }
+
+std::string ItemRegistryPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mItemData)); }
 
 } // namespace sculk::protocol::inline abi_v975

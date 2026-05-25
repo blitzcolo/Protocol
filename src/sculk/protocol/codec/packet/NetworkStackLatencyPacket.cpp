@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/NetworkStackLatencyPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void NetworkStackLatencyPacket::write(BinaryStream& stream) const {
 Result<> NetworkStackLatencyPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readUnsignedInt64(mCreationTime));
     return stream.readBool(mIsFromServer);
+}
+
+std::string NetworkStackLatencyPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mCreationTime), SCULK_FORMAT_FIELD(mIsFromServer));
 }
 
 } // namespace sculk::protocol::inline abi_v975

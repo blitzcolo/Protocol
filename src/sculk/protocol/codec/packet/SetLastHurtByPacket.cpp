@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetLastHurtByPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -16,5 +17,7 @@ std::string_view SetLastHurtByPacket::getName() const noexcept { return "SetLast
 void SetLastHurtByPacket::write(BinaryStream& stream) const { stream.writeVarInt(mLastHurtBy); }
 
 Result<> SetLastHurtByPacket::read(ReadOnlyBinaryStream& stream) { return stream.readVarInt(mLastHurtBy); }
+
+std::string SetLastHurtByPacket::toString() const { return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mLastHurtBy)); }
 
 } // namespace sculk::protocol::inline abi_v975

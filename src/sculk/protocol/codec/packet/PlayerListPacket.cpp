@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/PlayerListPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -76,6 +77,10 @@ Result<> PlayerListPacket::read(ReadOnlyBinaryStream& stream) {
         }
     }
     return {};
+}
+
+std::string PlayerListPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mAction), SCULK_FORMAT_FIELD(mPlayerEntryList));
 }
 
 } // namespace sculk::protocol::inline abi_v975

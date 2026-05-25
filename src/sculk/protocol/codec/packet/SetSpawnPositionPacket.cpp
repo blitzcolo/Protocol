@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetSpawnPositionPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,15 @@ Result<> SetSpawnPositionPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mBlockPosition.read(stream));
     _SCULK_READ(stream.readVarInt(mDimensionType));
     return mSpawnBlockPos.read(stream);
+}
+
+std::string SetSpawnPositionPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mSpawnPositionType),
+        SCULK_FORMAT_FIELD(mBlockPosition),
+        SCULK_FORMAT_FIELD(mDimensionType),
+        SCULK_FORMAT_FIELD(mSpawnBlockPos)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

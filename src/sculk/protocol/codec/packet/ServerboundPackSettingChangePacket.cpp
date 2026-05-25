@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ServerboundPackSettingChangePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -33,6 +34,17 @@ Result<> ServerboundPackSettingChangePacket::read(ReadOnlyBinaryStream& stream) 
     _SCULK_READ(stream.readBool(mBoolValue));
     _SCULK_READ(stream.readFloat(mFloatValue));
     return stream.readString(mStringValue);
+}
+
+std::string ServerboundPackSettingChangePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mPackId),
+        SCULK_FORMAT_FIELD(mPackSettingDataType),
+        SCULK_FORMAT_FIELD(mPackSettingName),
+        SCULK_FORMAT_FIELD(mBoolValue),
+        SCULK_FORMAT_FIELD(mFloatValue),
+        SCULK_FORMAT_FIELD(mStringValue)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

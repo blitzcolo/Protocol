@@ -7,6 +7,7 @@
 
 #include "sculk/protocol/codec/packet/CommandRequestPacket.hpp"
 #include "../utility/EnumName.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -26,6 +27,14 @@ Result<> CommandRequestPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mOriginData.read(stream));
     _SCULK_READ(stream.readBool(mIsInternal));
     return utils::readEnumName(stream, mVersion);
+}
+
+std::string CommandRequestPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mCommand),
+        SCULK_FORMAT_FIELD(mOriginData),
+        SCULK_FORMAT_FIELD(mIsInternal)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

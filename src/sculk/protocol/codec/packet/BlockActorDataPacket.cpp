@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/BlockActorDataPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void BlockActorDataPacket::write(BinaryStream& stream) const {
 Result<> BlockActorDataPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mBlockPosition.read(stream));
     return mActorDataTags.read(stream);
+}
+
+std::string BlockActorDataPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mBlockPosition), SCULK_FORMAT_FIELD(mActorDataTags));
 }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/AddPaintingPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,16 @@ Result<> AddPaintingPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mPosition.read(stream));
     _SCULK_READ(stream.readVarInt(mDirection));
     return stream.readString(mMotif);
+}
+
+std::string AddPaintingPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mRuntimeId),
+        SCULK_FORMAT_FIELD(mUniqueId),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mDirection),
+        SCULK_FORMAT_FIELD(mMotif)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

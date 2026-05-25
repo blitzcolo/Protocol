@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/MovePlayerPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -40,6 +41,21 @@ Result<> MovePlayerPacket::read(ReadOnlyBinaryStream& stream) {
         _SCULK_READ(stream.readSignedInt(mSourceActorType));
     }
     return stream.readUnsignedVarInt64(mTick);
+}
+
+std::string MovePlayerPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorRuntimeId),
+        SCULK_FORMAT_FIELD(mPosition),
+        SCULK_FORMAT_FIELD(mRotation),
+        SCULK_FORMAT_FIELD(mYHeadRotation),
+        SCULK_FORMAT_FIELD(mPositionMode),
+        SCULK_FORMAT_FIELD(mOnGround),
+        SCULK_FORMAT_FIELD(mRidingRuntimeId),
+        SCULK_FORMAT_FIELD(mTeleportationCause),
+        SCULK_FORMAT_FIELD(mSourceActorType),
+        SCULK_FORMAT_FIELD(mTick)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/SetDisplayObjectivePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -27,6 +28,16 @@ Result<> SetDisplayObjectivePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mObjectiveDisplayName));
     _SCULK_READ(stream.readString(mCriteriaName));
     return stream.readEnum(mSortOrder, &ReadOnlyBinaryStream::readVarInt);
+}
+
+std::string SetDisplayObjectivePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mDisplaySlotName),
+        SCULK_FORMAT_FIELD(mObjectiveName),
+        SCULK_FORMAT_FIELD(mObjectiveDisplayName),
+        SCULK_FORMAT_FIELD(mCriteriaName),
+        SCULK_FORMAT_FIELD(mSortOrder)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

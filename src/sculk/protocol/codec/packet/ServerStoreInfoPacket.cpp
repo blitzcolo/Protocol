@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ServerStoreInfoPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -21,6 +22,10 @@ void ServerStoreInfoPacket::write(BinaryStream& stream) const {
 Result<> ServerStoreInfoPacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readString(mStoreId));
     return stream.readString(mStoreName);
+}
+
+std::string ServerStoreInfoPacket::toString() const {
+    return SCULK_FORMAT_PACKET(SCULK_FORMAT_FIELD(mStoreId), SCULK_FORMAT_FIELD(mStoreName));
 }
 
 } // namespace sculk::protocol::inline abi_v975

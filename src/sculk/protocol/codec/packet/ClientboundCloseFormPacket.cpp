@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientboundCloseFormPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -18,5 +19,7 @@ std::string_view ClientboundCloseFormPacket::getName() const noexcept { return "
 void ClientboundCloseFormPacket::write(BinaryStream&) const {}
 
 Result<> ClientboundCloseFormPacket::read(ReadOnlyBinaryStream&) { return {}; }
+
+std::string ClientboundCloseFormPacket::toString() const { return SCULK_FORMAT_PACKET(); }
 
 } // namespace sculk::protocol::inline abi_v975

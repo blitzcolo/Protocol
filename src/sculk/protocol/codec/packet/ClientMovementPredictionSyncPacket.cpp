@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientMovementPredictionSyncPacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -54,6 +55,16 @@ Result<> ClientMovementPredictionSyncPacket::read(ReadOnlyBinaryStream& stream) 
     _SCULK_READ(mMovementAttributes.read(stream));
     _SCULK_READ(stream.readVarInt64(mActorID));
     return stream.readBool(mFlying);
+}
+
+std::string ClientMovementPredictionSyncPacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mActorFlags),
+        SCULK_FORMAT_FIELD(mActorBoundingBox),
+        SCULK_FORMAT_FIELD(mMovementAttributes),
+        SCULK_FORMAT_FIELD(mActorID),
+        SCULK_FORMAT_FIELD(mFlying)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975

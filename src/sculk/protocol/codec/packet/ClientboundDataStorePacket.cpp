@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/codec/packet/ClientboundDataStorePacket.hpp"
+#include "../utility/Format.hpp"
 
 namespace sculk::protocol::inline abi_v975 {
 
@@ -25,6 +26,14 @@ Result<> ClientboundDataStorePacket::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(mDataStoreUpdate.read(stream));
     _SCULK_READ(mDataStoreChange.read(stream));
     return mDataStoreRemoval.read(stream);
+}
+
+std::string ClientboundDataStorePacket::toString() const {
+    return SCULK_FORMAT_PACKET(
+        SCULK_FORMAT_FIELD(mDataStoreUpdate),
+        SCULK_FORMAT_FIELD(mDataStoreChange),
+        SCULK_FORMAT_FIELD(mDataStoreRemoval)
+    );
 }
 
 } // namespace sculk::protocol::inline abi_v975
