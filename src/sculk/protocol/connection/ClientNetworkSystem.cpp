@@ -66,8 +66,35 @@ PacketBufferPool gPacketBufferPool{};
 
 ClientNetworkSystem::ClientNetworkSystem(std::size_t workerThreadCount)
 : mPeer(RakNet::RakPeerInterface::GetInstance()),
-  mThreadPool(workerThreadCount),
-  mScheduler(mThreadPool) {}
+  mOwnedThreadPool(std::make_unique<thread::ThreadPool>(workerThreadCount)),
+  mThreadPool(mOwnedThreadPool.get()),
+  mIoRuntime(nullptr),
+  mScheduler(*mThreadPool) {}
+
+ClientNetworkSystem::ClientNetworkSystem(thread::ThreadPool& threadPool)
+: mPeer(RakNet::RakPeerInterface::GetInstance()),
+  mOwnedThreadPool(nullptr),
+  mThreadPool(&threadPool),
+  mIoRuntime(nullptr),
+  mScheduler(*mThreadPool) {}
+
+ClientNetworkSystem::ClientNetworkSystem(io::ClientIoRuntime& ioRuntime, std::size_t workerThreadCount)
+: mPeer(RakNet::RakPeerInterface::GetInstance()),
+  mOwnedThreadPool(std::make_unique<thread::ThreadPool>(workerThreadCount)),
+  mThreadPool(mOwnedThreadPool.get()),
+  mIoRuntime(&ioRuntime),
+  mScheduler(*mThreadPool) {
+    mUsesSharedIoRuntime = true;
+}
+
+ClientNetworkSystem::ClientNetworkSystem(thread::ThreadPool& threadPool, io::ClientIoRuntime& ioRuntime)
+: mPeer(RakNet::RakPeerInterface::GetInstance()),
+  mOwnedThreadPool(nullptr),
+  mThreadPool(&threadPool),
+  mIoRuntime(&ioRuntime),
+  mScheduler(*mThreadPool) {
+    mUsesSharedIoRuntime = true;
+}
 
 ClientNetworkSystem::~ClientNetworkSystem() { disconnect(); }
 
@@ -84,8 +111,7 @@ bool ClientNetworkSystem::connect(
 
     if (mIoThread.joinable()) {
         mIoThread.request_stop();
-        mSendWakeRequested.store(true, std::memory_order_release);
-        mIoWaitCv.notify_all();
+        mIoWakeSignal.release();
         mIoThread.join();
     }
 
@@ -112,7 +138,13 @@ bool ClientNetworkSystem::connect(
         return false;
     }
 
-    mIoThread = std::jthread([this](std::stop_token token) { ioLoop(token); });
+    mLastFlushTime = std::chrono::steady_clock::now() - SEND_FLUSH_INTERVAL;
+    if (mUsesSharedIoRuntime) {
+        mIoRuntime->registerClient(*this);
+        mIoRuntime->notifyWork();
+    } else {
+        mIoThread = std::jthread([this](std::stop_token token) { ioLoop(token); });
+    }
     return true;
 }
 
@@ -136,10 +168,11 @@ void ClientNetworkSystem::disconnect() {
         mPeer->CloseConnection(remote, true, 0, HIGH_PRIORITY);
     }
 
-    if (mIoThread.joinable()) {
+    if (mUsesSharedIoRuntime) {
+        mIoRuntime->unregisterClient(*this);
+    } else if (mIoThread.joinable()) {
         mIoThread.request_stop();
-        mSendWakeRequested.store(true, std::memory_order_release);
-        mIoWaitCv.notify_all();
+        mIoWakeSignal.release();
         mIoThread.join();
     }
 
@@ -170,10 +203,7 @@ bool ClientNetworkSystem::sendPacket(std::span<const std::byte> buffer) noexcept
         return false;
     }
 
-    bool expectedWake = false;
-    if (mSendWakeRequested.compare_exchange_strong(expectedWake, true, std::memory_order_acq_rel)) {
-        mIoWaitCv.notify_one();
-    }
+    notifyIoWorker();
     return true;
 }
 
@@ -183,31 +213,17 @@ std::uint32_t ClientNetworkSystem::sendPacketImmediately(std::span<const std::by
         return 0;
     }
 
-    thread_local PacketBufferBatch singlePacketBatch;
-    singlePacketBatch.clear();
-    singlePacketBatch.emplace_back(buffer.begin(), buffer.end());
-
-    auto batched = Session::serializeBatchedPackets(singlePacketBatch);
-    if (batched.empty()) {
-        return 0;
-    }
-
     auto receipt = mNextImmediateReceipt.fetch_add(1, std::memory_order_relaxed);
     if (receipt == 0) {
         receipt = mNextImmediateReceipt.fetch_add(1, std::memory_order_relaxed);
     }
 
-    auto framed = prependMinecraftBatchHeader(batched);
-    gPacketBufferPool.release(std::move(batched));
-    if (!mImmediateSends.enqueue(ImmediateSendRequest{session, std::move(framed), receipt})) {
-        gPacketBufferPool.release(std::move(framed));
+    PacketBuffer payload(buffer.begin(), buffer.end());
+    if (!mImmediateSends.enqueue(ImmediateSendRequest{session, std::move(payload), receipt})) {
         return 0;
     }
 
-    bool expectedWake = false;
-    if (mSendWakeRequested.compare_exchange_strong(expectedWake, true, std::memory_order_acq_rel)) {
-        mIoWaitCv.notify_one();
-    }
+    notifyIoWorker();
 
     return receipt;
 }
@@ -218,6 +234,15 @@ bool ClientNetworkSystem::receivePacket(std::vector<std::byte>& outBuffer) noexc
         return false;
     }
     return session->receivePacket(outBuffer);
+}
+
+coro::Task<Result<std::vector<std::byte>>> ClientNetworkSystem::receivePacketAsync() {
+    auto session = mSession.load(std::memory_order_acquire);
+    if (!session) {
+        co_return error_utils::makeError("no active session");
+    }
+
+    co_return co_await session->receivePacketAsync();
 }
 
 bool ClientNetworkSystem::getNetworkStatus(NetworkStatus& outStatus) const noexcept {
@@ -282,42 +307,56 @@ bool ClientNetworkSystem::unsubscribeEvents(std::uint64_t subscriptionId) {
 }
 
 void ClientNetworkSystem::ioLoop(std::stop_token stopToken) {
-    auto lastFlush = std::chrono::steady_clock::now() - SEND_FLUSH_INTERVAL;
-
     while (!stopToken.stop_requested() && mRunning.load(std::memory_order_acquire)) {
-        bool progressed = false;
-
-        for (RakNet::Packet* packet = mPeer->Receive(); packet != nullptr; packet = mPeer->Receive()) {
-            progressed = true;
-            processIncomingPacket(packet);
-            mPeer->DeallocatePacket(packet);
-        }
-
-        const auto now = std::chrono::steady_clock::now();
-        if (now - lastFlush >= SEND_FLUSH_INTERVAL) {
-            flushOutboundPackets();
-            lastFlush = now;
-        }
+        mSendWakeRequested.store(false, std::memory_order_release);
+        const bool progressed = ioTickOnce();
 
         if (!progressed) {
             const auto nowIdle    = std::chrono::steady_clock::now();
-            const auto untilFlush = (lastFlush + SEND_FLUSH_INTERVAL <= nowIdle)
+            const auto untilFlush = (mLastFlushTime + SEND_FLUSH_INTERVAL <= nowIdle)
                                       ? std::chrono::steady_clock::duration::zero()
-                                      : (lastFlush + SEND_FLUSH_INTERVAL - nowIdle);
+                                      : (mLastFlushTime + SEND_FLUSH_INTERVAL - nowIdle);
             const auto receiveBudget =
                 std::chrono::duration_cast<std::chrono::steady_clock::duration>(RECEIVE_IDLE_SLEEP);
             const auto waitBudget = std::min(untilFlush, receiveBudget);
 
-            std::unique_lock lock(mIoWaitMutex);
-            (void)mIoWaitCv.wait_for(lock, waitBudget, [this, &stopToken] {
-                if (stopToken.stop_requested()) {
-                    return true;
-                }
-
-                return mSendWakeRequested.exchange(false, std::memory_order_acq_rel);
-            });
+            if (waitBudget > std::chrono::steady_clock::duration::zero() && !stopToken.stop_requested()) {
+                (void)mIoWakeSignal.try_acquire_for(waitBudget);
+            }
         }
     }
+}
+
+bool ClientNetworkSystem::ioTickOnce() noexcept {
+    bool progressed = false;
+
+    for (RakNet::Packet* packet = mPeer->Receive(); packet != nullptr; packet = mPeer->Receive()) {
+        progressed = true;
+        processIncomingPacket(packet);
+        mPeer->DeallocatePacket(packet);
+    }
+
+    const auto now = std::chrono::steady_clock::now();
+    if (now - mLastFlushTime >= SEND_FLUSH_INTERVAL) {
+        flushOutboundPackets();
+        mLastFlushTime = now;
+        progressed     = true;
+    }
+
+    return progressed;
+}
+
+void ClientNetworkSystem::notifyIoWorker() noexcept {
+    if (mSendWakeRequested.exchange(true, std::memory_order_acq_rel)) {
+        return;
+    }
+
+    if (mUsesSharedIoRuntime) {
+        mIoRuntime->notifyWork();
+        return;
+    }
+
+    mIoWakeSignal.release();
 }
 
 void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
@@ -348,8 +387,7 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
         }
 
         mRunning.store(false, std::memory_order_release);
-        mSendWakeRequested.store(true, std::memory_order_release);
-        mIoWaitCv.notify_all();
+        notifyIoWorker();
 
         if (mPeer) {
             mPeer->Shutdown(0, 0, HIGH_PRIORITY);
@@ -370,8 +408,12 @@ void ClientNetworkSystem::processIncomingPacket(RakNet::Packet* packet) {
 
     const auto* payloadBegin = reinterpret_cast<const std::byte*>(packet->data + 1);
     const auto  payloadSize  = static_cast<std::size_t>(packet->length - 1);
-    auto        packets      = Session::deserializeBatchPackets(std::span<const std::byte>{payloadBegin, payloadSize});
-    for (auto& payload : packets) {
+    auto        packets      = session->deserializeBatchPackets(std::span<const std::byte>{payloadBegin, payloadSize});
+    if (!packets) {
+        return;
+    }
+
+    for (auto& payload : *packets) {
         (void)session->enqueueInboundPacket(std::move(payload));
     }
 }
@@ -381,10 +423,10 @@ void ClientNetworkSystem::emitEvent(NetworkEvent event) {
 
     for (const auto& [_, handler] : *handlers) {
         auto copiedHandler = handler;
-        if (!mThreadPool.submit([event, copiedHandler = std::move(copiedHandler)]() mutable {
+        if (!mThreadPool->submit([event, copiedHandler = std::move(copiedHandler)]() mutable {
                 copiedHandler(event);
             })) {
-            copiedHandler(event);
+            mDroppedEventCallbacks.fetch_add(1, std::memory_order_relaxed);
         }
     }
 }
@@ -418,10 +460,10 @@ void ClientNetworkSystem::flushOutboundPackets() {
     }
 
     if (!payloadBatch.empty()) {
-        auto batched = Session::serializeBatchedPackets(payloadBatch);
+        auto batched = session->serializeBatchedPackets(payloadBatch);
         if (!batched.empty()) {
             auto framed = prependMinecraftBatchHeader(batched);
-            (void)session->sendPacketImmediately(framed);
+            (void)session->sendRawPacketImmediately(framed);
             gPacketBufferPool.release(std::move(batched));
             gPacketBufferPool.release(std::move(framed));
         }

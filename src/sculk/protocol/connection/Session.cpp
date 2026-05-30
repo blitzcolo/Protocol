@@ -6,6 +6,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/connection/Session.hpp"
+#include "sculk/protocol/connection/compression/Snappy.hpp"
+#include "sculk/protocol/connection/compression/Zlib.hpp"
 #include "sculk/protocol/connection/coro/Scheduler.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
@@ -16,6 +18,8 @@
 namespace sculk::protocol::inline abi_v975 {
 
 namespace {
+
+constexpr std::uint8_t MINECRAFT_BATCH_PACKET_ID = 0xFE;
 
 [[nodiscard]] NetworkStatus::ConnectionState mapConnectionState(RakNet::ConnectionState state) noexcept {
     switch (state) {
@@ -88,6 +92,28 @@ Session::sendPacketImmediately(std::span<const std::byte> buffer, std::uint32_t 
         return 0;
     }
 
+    thread_local PacketBufferBatch singlePacketBatch;
+    singlePacketBatch.clear();
+    singlePacketBatch.emplace_back(buffer.begin(), buffer.end());
+
+    auto batched = serializeBatchedPackets(singlePacketBatch);
+    if (batched.empty()) {
+        return 0;
+    }
+
+    PacketBuffer framed{};
+    framed.reserve(batched.size() + 1);
+    framed.push_back(static_cast<std::byte>(MINECRAFT_BATCH_PACKET_ID));
+    framed.insert(framed.end(), batched.begin(), batched.end());
+    return sendRawPacketImmediately(framed, forceReceiptNumber);
+}
+
+std::uint32_t
+Session::sendRawPacketImmediately(std::span<const std::byte> buffer, std::uint32_t forceReceiptNumber) noexcept {
+    if (!mConnected.load(std::memory_order_relaxed) || !mPeer || buffer.empty()) {
+        return 0;
+    }
+
     return mPeer->Send(
         reinterpret_cast<const char*>(buffer.data()),
         static_cast<int>(buffer.size()),
@@ -136,6 +162,8 @@ RakNet::RakNetGUID Session::guid() const noexcept { return mRemote.rakNetGuid; }
 
 RakNet::AddressOrGUID Session::remoteEndpoint() const noexcept { return mRemote; }
 
+#define SCULK_RAKNET_FLAG(x) static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::x)
+
 NetworkStatus Session::getNetworkStatus() const noexcept {
     NetworkStatus status{};
     status.mGuid        = mRemote.rakNetGuid;
@@ -177,29 +205,19 @@ NetworkStatus Session::getNetworkStatus() const noexcept {
     status.mPacketLossLastSecond   = stats->packetlossLastSecond;
     status.mPacketLossTotal        = stats->packetlossTotal;
 
-    status.mUserMessageBytesPushedPerSecond =
-        stats->valueOverLastSecond[static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::USER_MESSAGE_BYTES_PUSHED)];
-    status.mUserMessageBytesSentPerSecond =
-        stats->valueOverLastSecond[static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::USER_MESSAGE_BYTES_SENT)];
-    status.mUserMessageBytesResentPerSecond =
-        stats->valueOverLastSecond[static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::USER_MESSAGE_BYTES_RESENT)];
-    status.mUserMessageBytesReceivedPerSecond = stats->valueOverLastSecond[static_cast<std::uint32_t>(
-        RakNet::RNSPerSecondMetrics::USER_MESSAGE_BYTES_RECEIVED_PROCESSED
-    )];
-    status.mActualBytesSentPerSecond =
-        stats->valueOverLastSecond[static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::ACTUAL_BYTES_SENT)];
-    status.mActualBytesReceivedPerSecond =
-        stats->valueOverLastSecond[static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::ACTUAL_BYTES_RECEIVED)];
+    status.mUserMessageBytesPushedPerSecond = stats->valueOverLastSecond[SCULK_RAKNET_FLAG(USER_MESSAGE_BYTES_PUSHED)];
+    status.mUserMessageBytesSentPerSecond   = stats->valueOverLastSecond[SCULK_RAKNET_FLAG(USER_MESSAGE_BYTES_SENT)];
+    status.mUserMessageBytesResentPerSecond = stats->valueOverLastSecond[SCULK_RAKNET_FLAG(USER_MESSAGE_BYTES_RESENT)];
+    status.mUserMessageBytesReceivedPerSecond =
+        stats->valueOverLastSecond[SCULK_RAKNET_FLAG(USER_MESSAGE_BYTES_RECEIVED_PROCESSED)];
+    status.mActualBytesSentPerSecond     = stats->valueOverLastSecond[SCULK_RAKNET_FLAG(ACTUAL_BYTES_SENT)];
+    status.mActualBytesReceivedPerSecond = stats->valueOverLastSecond[SCULK_RAKNET_FLAG(ACTUAL_BYTES_RECEIVED)];
 
-    status.mUserMessageBytesSentTotal =
-        stats->runningTotal[static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::USER_MESSAGE_BYTES_SENT)];
-    status.mUserMessageBytesReceivedTotal = stats->runningTotal[static_cast<std::uint32_t>(
-        RakNet::RNSPerSecondMetrics::USER_MESSAGE_BYTES_RECEIVED_PROCESSED
-    )];
-    status.mActualBytesSentTotal =
-        stats->runningTotal[static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::ACTUAL_BYTES_SENT)];
-    status.mActualBytesReceivedTotal =
-        stats->runningTotal[static_cast<std::uint32_t>(RakNet::RNSPerSecondMetrics::ACTUAL_BYTES_RECEIVED)];
+    status.mUserMessageBytesSentTotal = stats->runningTotal[SCULK_RAKNET_FLAG(USER_MESSAGE_BYTES_SENT)];
+    status.mUserMessageBytesReceivedTotal =
+        stats->runningTotal[SCULK_RAKNET_FLAG(USER_MESSAGE_BYTES_RECEIVED_PROCESSED)];
+    status.mActualBytesSentTotal     = stats->runningTotal[SCULK_RAKNET_FLAG(ACTUAL_BYTES_SENT)];
+    status.mActualBytesReceivedTotal = stats->runningTotal[SCULK_RAKNET_FLAG(ACTUAL_BYTES_RECEIVED)];
 
     status.mBytesInResendBuffer    = stats->bytesInResendBuffer;
     status.mMessagesInResendBuffer = stats->messagesInResendBuffer;
@@ -262,32 +280,95 @@ std::size_t Session::tryDequeueAllOutboundPackets(OutboundBatch& outPackets) noe
 }
 
 PacketBuffer Session::serializeBatchedPackets(const PacketBufferBatch& packets) {
-    PacketBuffer buffer{};
-    BinaryStream stream{buffer};
+    PacketBuffer packetsBuffer{};
+    BinaryStream packetStream{packetsBuffer};
     for (const auto& packet : packets) {
-        stream.writeUnsignedVarInt(static_cast<std::uint32_t>(packet.size()));
-        stream.writeBytes(packet.data(), packet.size());
+        packetStream.writeUnsignedVarInt(static_cast<std::uint32_t>(packet.size()));
+        packetStream.writeBytes(packet.data(), packet.size());
     }
-    // TODO
-    return buffer;
+
+    PacketBuffer finalBuffer{};
+    BinaryStream compressedStream{finalBuffer};
+
+    if (isCompressed()) {
+        CompressionType headerType = CompressionType::None;
+        if (packetsBuffer.size() >= mCompressionThreshold) {
+            headerType = *mCompressionType;
+            switch (headerType) {
+            case CompressionType::Zlib: {
+                packetsBuffer = compression::zlib::compress(packetsBuffer);
+                break;
+            }
+            case CompressionType::Snappy: {
+                packetsBuffer = compression::snappy::compress(packetsBuffer);
+                break;
+            }
+            default:
+                break;
+            }
+        }
+
+        compressedStream.writeEnum(headerType, &BinaryStream::writeSignedChar);
+    }
+    compressedStream.writeAndMoveBuffer(std::move(packetsBuffer));
+
+    // TODO: encryption
+
+    return finalBuffer;
 }
 
-PacketBufferBatch Session::deserializeBatchPackets(std::span<const std::byte> batchedBuffer) {
-    ReadOnlyBinaryStream stream{batchedBuffer};
+Result<PacketBufferBatch> Session::deserializeBatchPackets(std::span<const std::byte> batchedBuffer) {
+    // TODO: decryption
+    ReadOnlyBinaryStream compressedStream{batchedBuffer};
+    PacketBuffer         decompressedBuffer{};
+
+    if (isCompressed()) {
+        CompressionType type{};
+        if (!compressedStream.readEnum(type, &ReadOnlyBinaryStream::readSignedChar)) {
+            return error_utils::makeError("failed to read compression type from batch packet");
+        }
+
+        const auto   compressedPayload = compressedStream.getLeftBufferView();
+        PacketBuffer compressedBuffer(compressedPayload.begin(), compressedPayload.end());
+        switch (type) {
+        case CompressionType::Zlib: {
+            auto res = compression::zlib::decompress(compressedBuffer);
+            if (!res) {
+                return error_utils::makeError("zlib decompression failed");
+            }
+            decompressedBuffer = std::move(*res);
+            break;
+        }
+        case CompressionType::Snappy: {
+            auto res = compression::snappy::decompress(compressedBuffer);
+            if (!res) {
+                return error_utils::makeError("snappy decompression failed");
+            }
+            decompressedBuffer = std::move(*res);
+            break;
+        }
+        default:
+            decompressedBuffer = std::move(compressedBuffer);
+            break;
+        }
+    } else {
+        decompressedBuffer.assign(batchedBuffer.begin(), batchedBuffer.end());
+    }
+
+    ReadOnlyBinaryStream stream{decompressedBuffer};
     PacketBufferBatch    packets{};
 
     while (stream.hasDataLeft()) {
         std::uint32_t packetSize{};
         if (!stream.readUnsignedVarInt(packetSize)) {
-            return {};
+            return error_utils::makeError("failed to read batched packet size");
         }
         std::vector<std::byte> packetData(packetSize, std::byte{});
         if (!stream.readBytes(packetData.data(), packetSize)) {
-            return {};
+            return error_utils::makeError("failed to read batched packet payload");
         }
         packets.push_back(std::move(packetData));
     }
-    // TODO
 
     return packets;
 }

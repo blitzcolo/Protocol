@@ -9,15 +9,16 @@
 #include "NetworkEvent.hpp"
 #include "Session.hpp"
 #include "sculk/protocol/connection/coro/Scheduler.hpp"
+#include "sculk/protocol/connection/io/ClientIoRuntime.hpp"
 #include "sculk/protocol/connection/thread/ThreadPool.hpp"
 #include <RakPeerInterface.h>
 #include <atomic>
-#include <condition_variable>
+#include <chrono>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <mutex>
+#include <semaphore>
 #include <span>
 #include <string>
 #include <thread>
@@ -34,6 +35,9 @@ public:
     // 3) poll receivePacket(outBuffer) in your game loop
     // 4) disconnect() on shutdown
     explicit ClientNetworkSystem(std::size_t workerThreadCount = 0);
+    explicit ClientNetworkSystem(thread::ThreadPool& threadPool);
+    ClientNetworkSystem(io::ClientIoRuntime& ioRuntime, std::size_t workerThreadCount = 0);
+    ClientNetworkSystem(thread::ThreadPool& threadPool, io::ClientIoRuntime& ioRuntime);
 
     ClientNetworkSystem(const ClientNetworkSystem&)            = delete;
     ClientNetworkSystem& operator=(const ClientNetworkSystem&) = delete;
@@ -63,6 +67,8 @@ public:
 
     [[nodiscard]] bool receivePacket(std::vector<std::byte>& outBuffer) noexcept;
 
+    [[nodiscard]] coro::Task<Result<std::vector<std::byte>>> receivePacketAsync();
+
     // Returns false when no active session is available.
     [[nodiscard]] bool getNetworkStatus(NetworkStatus& outStatus) const noexcept;
 
@@ -71,6 +77,8 @@ public:
     [[nodiscard]] bool unsubscribeEvents(std::uint64_t subscriptionId);
 
 private:
+    friend class io::ClientIoRuntime;
+
     struct RakPeerDeleter {
         void operator()(RakNet::RakPeerInterface* peer) const noexcept;
     };
@@ -90,21 +98,29 @@ private:
 
     void flushOutboundPackets();
 
+    [[nodiscard]] bool ioTickOnce() noexcept;
+
+    void notifyIoWorker() noexcept;
+
     void emitEvent(NetworkEvent event);
 
 private:
     std::unique_ptr<RakNet::RakPeerInterface, RakPeerDeleter> mPeer{};
-    thread::ThreadPool                                        mThreadPool;
+    std::unique_ptr<thread::ThreadPool>                       mOwnedThreadPool{};
+    thread::ThreadPool*                                       mThreadPool{};
+    io::ClientIoRuntime*                                      mIoRuntime{};
     coro::Scheduler                                           mScheduler;
     std::atomic_bool                                          mRunning{false};
+    bool                                                      mUsesSharedIoRuntime{false};
     std::jthread                                              mIoThread{};
+    std::chrono::steady_clock::time_point                     mLastFlushTime{};
     std::atomic<SessionPtr>                                   mSession{};
     moodycamel::ConcurrentQueue<ImmediateSendRequest>         mImmediateSends{};
-    std::mutex                                                mIoWaitMutex{};
-    std::condition_variable                                   mIoWaitCv{};
+    std::counting_semaphore<>                                 mIoWakeSignal{0};
     std::atomic_bool                                          mSendWakeRequested{false};
     std::atomic_uint32_t                                      mNextImmediateReceipt{1};
     std::atomic_uint64_t                                      mNextSubscriptionId{1};
+    std::atomic_uint64_t                                      mDroppedEventCallbacks{0};
     std::atomic<std::shared_ptr<const EventHandlerVec>>       mEventHandlersSnapshot{
         std::shared_ptr<const EventHandlerVec>{std::make_shared<EventHandlerVec>()}
     };

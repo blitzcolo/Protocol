@@ -5,21 +5,15 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-#pragma once
+#include "sculk/protocol/connection/compression/Zlib.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <algorithm>
 #include <array>
-#include <cstddef>
 #include <cstring>
 #include <limits>
-#include <vector>
 #include <zlib.h>
 
 namespace sculk::protocol::inline abi_v975::compression::zlib {
-
-[[nodiscard]] inline std::vector<std::byte> compress(const std::vector<std::byte>& data);
-
-[[nodiscard]] inline Result<std::vector<std::byte>> decompress(const std::vector<std::byte>& data);
 
 namespace detail {
 
@@ -57,7 +51,7 @@ constexpr std::size_t kMaxOutputSize = 64ull * 1024ull * 1024ull;
 
 } // namespace detail
 
-inline std::vector<std::byte> compress(const std::vector<std::byte>& data) {
+std::vector<std::byte> compress(const std::vector<std::byte>& data) {
     if (data.empty()) {
         return {};
     }
@@ -110,7 +104,7 @@ inline std::vector<std::byte> compress(const std::vector<std::byte>& data) {
     return output;
 }
 
-inline Result<std::vector<std::byte>> decompress(const std::vector<std::byte>& data) {
+Result<std::vector<std::byte>> decompress(const std::vector<std::byte>& data) {
     if (data.empty()) {
         return error_utils::makeError("zlib decompress failed: input is empty");
     }

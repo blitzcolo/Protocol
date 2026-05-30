@@ -5,19 +5,13 @@
 //
 // SPDX-License-Identifier: MPL-2.0
 
-#pragma once
+#include "sculk/protocol/connection/compression/Snappy.hpp"
 #include "sculk/protocol/utility/Result.hpp"
-#include <cstddef>
 #include <snappy.h>
-#include <vector>
 
 namespace sculk::protocol::inline abi_v975::compression::snappy {
 
-[[nodiscard]] inline std::vector<std::byte> compress(const std::vector<std::byte>& data);
-
-[[nodiscard]] inline Result<std::vector<std::byte>> decompress(const std::vector<std::byte>& data);
-
-inline std::vector<std::byte> compress(const std::vector<std::byte>& data) {
+std::vector<std::byte> compress(const std::vector<std::byte>& data) {
     if (data.empty()) {
         return {};
     }
@@ -37,7 +31,7 @@ inline std::vector<std::byte> compress(const std::vector<std::byte>& data) {
     return output;
 }
 
-inline Result<std::vector<std::byte>> decompress(const std::vector<std::byte>& data) {
+Result<std::vector<std::byte>> decompress(const std::vector<std::byte>& data) {
     if (data.empty()) {
         return error_utils::makeError("snappy decompress failed: input is empty");
     }

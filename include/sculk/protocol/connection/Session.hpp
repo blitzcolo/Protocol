@@ -15,6 +15,7 @@
 #include <coroutine>
 #include <cstddef>
 #include <cstdint>
+#include <optional>
 #include <span>
 #include <utility>
 #include <vector>
@@ -34,6 +35,13 @@ using PacketBufferBatch = std::vector<PacketBuffer>;
 using OutboundBatch     = std::vector<OutboundPacket>;
 
 class Session {
+public:
+    enum class CompressionType : std::int8_t {
+        None   = -1,
+        Zlib   = 0,
+        Snappy = 1,
+    };
+
 protected:
     RakNet::RakPeerInterface*                            mPeer{};
     RakNet::AddressOrGUID                                mRemote{};
@@ -43,6 +51,8 @@ protected:
     moodycamel::ConcurrentQueue<std::coroutine_handle<>> mReceiveWaiters{};
     std::atomic_bool                                     mConnected{true};
     std::atomic_bool                                     mOutboundDirty{false};
+    std::optional<CompressionType>                       mCompressionType{};
+    std::size_t                                          mCompressionThreshold{};
 
 public:
     explicit Session(RakNet::RakPeerInterface* peer, RakNet::AddressOrGUID remote, coro::Scheduler* scheduler) noexcept;
@@ -56,15 +66,27 @@ public:
     virtual ~Session() = default;
 
 public:
+    [[nodiscard]] bool isCompressed() const noexcept { return mCompressionType.has_value(); }
+
+    void setCompressionType(CompressionType type) noexcept { mCompressionType = type; }
+
+    [[nodiscard]] std::size_t getCompressionThreshold() const noexcept { return mCompressionThreshold; }
+
+    void setCompressionThreshold(std::size_t threshold) noexcept { mCompressionThreshold = threshold; }
+
     // Queue-based send. Network I/O thread flushes the queue later.
     [[nodiscard]] bool sendPacket(std::span<const std::byte> buffer) noexcept;
 
     // Move-friendly queue-based send.
     [[nodiscard]] bool sendPacket(std::vector<std::byte>&& buffer) noexcept;
 
-    // Immediate send path (bypasses outbound queue).
+    // Immediate send path for one logical packet. The packet is still wrapped into a batch before transport send.
     [[nodiscard]] std::uint32_t
     sendPacketImmediately(std::span<const std::byte> buffer, std::uint32_t forceReceiptNumber = 0) noexcept;
+
+    // Low-level immediate send for payloads that are already fully serialized for transport.
+    [[nodiscard]] std::uint32_t
+    sendRawPacketImmediately(std::span<const std::byte> buffer, std::uint32_t forceReceiptNumber = 0) noexcept;
 
     // Non-blocking receive. Returns false when queue is empty.
     [[nodiscard]] bool receivePacket(std::vector<std::byte>& outBuffer) noexcept;
@@ -97,9 +119,9 @@ public:
 
     std::size_t tryDequeueAllOutboundPackets(OutboundBatch& outPackets) noexcept;
 
-    [[nodiscard]] static PacketBuffer serializeBatchedPackets(const PacketBufferBatch& packets);
+    [[nodiscard]] PacketBuffer serializeBatchedPackets(const PacketBufferBatch& packets);
 
-    [[nodiscard]] static PacketBufferBatch deserializeBatchPackets(std::span<const std::byte> batchedBuffer);
+    [[nodiscard]] Result<PacketBufferBatch> deserializeBatchPackets(std::span<const std::byte> batchedBuffer);
 
     void notifyOneReceiver() noexcept;
 

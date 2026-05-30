@@ -12,13 +12,13 @@
 #include "sculk/protocol/connection/thread/ThreadPool.hpp"
 #include <RakPeerInterface.h>
 #include <atomic>
-#include <condition_variable>
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <mutex>
 #include <parallel_hashmap/phmap.h>
+#include <queue>
+#include <semaphore>
 #include <span>
 #include <thread>
 #include <utility>
@@ -34,6 +34,7 @@ public:
     // 3) poll receiveFromClient(guid, outBuffer) from your logic threads
     // 4) stop() on shutdown
     explicit ServerNetworkSystem(std::size_t workerThreadCount = 0);
+    explicit ServerNetworkSystem(thread::ThreadPool& threadPool);
 
     ServerNetworkSystem(const ServerNetworkSystem&)            = delete;
     ServerNetworkSystem& operator=(const ServerNetworkSystem&) = delete;
@@ -55,10 +56,17 @@ public:
 
     [[nodiscard]] bool sendToClient(RakNet::RakNetGUID guid, std::span<const std::byte> buffer) noexcept;
 
+    [[nodiscard]] bool sendToClient(RakNet::RakNetGUID guid, std::vector<std::byte>&& buffer) noexcept;
+
     [[nodiscard]] std::uint32_t
     sendToClientImmediately(RakNet::RakNetGUID guid, std::span<const std::byte> buffer) noexcept;
 
+    [[nodiscard]] std::uint32_t
+    sendToClientImmediately(RakNet::RakNetGUID guid, std::vector<std::byte>&& buffer) noexcept;
+
     [[nodiscard]] bool receiveFromClient(RakNet::RakNetGUID guid, std::vector<std::byte>& outBuffer) noexcept;
+
+    [[nodiscard]] coro::Task<Result<std::vector<std::byte>>> receiveFromClientAsync(RakNet::RakNetGUID guid);
 
     // Returns false when the target session does not exist.
     [[nodiscard]] bool getClientNetworkStatus(RakNet::RakNetGUID guid, NetworkStatus& outStatus) const noexcept;
@@ -77,9 +85,18 @@ private:
     using SessionPtr = std::shared_ptr<Session>;
     using SessionMap = phmap::flat_hash_map<std::uint64_t, SessionPtr>;
     struct ImmediateSendRequest {
-        SessionPtr    mSession{};
+        std::uint64_t mGuid{};
         PacketBuffer  mPayload{};
         std::uint32_t mForceReceiptNumber{};
+    };
+    struct FlushScheduleEntry {
+        std::uint64_t mGuid{};
+        std::uint64_t mDueTimeNs{};
+    };
+    struct FlushScheduleCompare {
+        [[nodiscard]] bool operator()(const FlushScheduleEntry& lhs, const FlushScheduleEntry& rhs) const noexcept {
+            return lhs.mDueTimeNs > rhs.mDueTimeNs;
+        }
     };
     using EventHandler    = std::pair<std::uint64_t, std::function<void(const NetworkEvent&)>>;
     using EventHandlerVec = std::vector<EventHandler>;
@@ -90,26 +107,36 @@ private:
 
     void ioLoop(std::stop_token stopToken);
 
+    [[nodiscard]] bool ioTickOnce() noexcept;
+
     void processIncomingPacket(RakNet::Packet* packet);
 
     void flushOutboundPackets();
 
+    void notifyIoWorker() noexcept;
+
 private:
     std::unique_ptr<RakNet::RakPeerInterface, RakPeerDeleter> mPeer{};
-    thread::ThreadPool                                        mThreadPool;
+    std::unique_ptr<thread::ThreadPool>                       mOwnedThreadPool{};
+    thread::ThreadPool*                                       mThreadPool{};
     coro::Scheduler                                           mScheduler;
     std::atomic_bool                                          mRunning{false};
     std::jthread                                              mIoThread{};
     std::atomic<std::shared_ptr<const SessionMap>>            mSessionsSnapshot{
         std::shared_ptr<const SessionMap>{std::make_shared<SessionMap>()}
     };
-    moodycamel::ConcurrentQueue<ImmediateSendRequest>   mImmediateSends{};
-    moodycamel::ConcurrentQueue<SessionPtr>             mDirtySessions{};
-    std::mutex                                          mIoWaitMutex{};
-    std::condition_variable                             mIoWaitCv{};
+    moodycamel::ConcurrentQueue<ImmediateSendRequest>  mImmediateSends{};
+    moodycamel::ConcurrentQueue<std::uint64_t>         mDirtySessionGuids{};
+    phmap::flat_hash_map<std::uint64_t, std::uint64_t> mScheduledDueTimeByGuid{};
+    std::priority_queue<FlushScheduleEntry, std::vector<FlushScheduleEntry>, FlushScheduleCompare> mFlushSchedule{};
+    std::uint8_t                                        mAdaptiveBudgetLevel{0};
+    std::uint8_t                                        mPromoteStreak{0};
+    std::uint8_t                                        mDemoteStreak{0};
+    std::counting_semaphore<>                           mIoWakeSignal{0};
     std::atomic_bool                                    mSendWakeRequested{false};
     std::atomic_uint32_t                                mNextImmediateReceipt{1};
     std::atomic_uint64_t                                mNextSubscriptionId{1};
+    std::atomic_uint64_t                                mDroppedEventCallbacks{0};
     std::atomic<std::shared_ptr<const EventHandlerVec>> mEventHandlersSnapshot{
         std::shared_ptr<const EventHandlerVec>{std::make_shared<EventHandlerVec>()}
     };
