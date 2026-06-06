@@ -34,12 +34,12 @@ public:
     CryptoManager(CryptoManager&&)                 = delete;
     CryptoManager& operator=(CryptoManager&&)      = delete;
 
-    explicit CryptoManager(std::vector<std::byte>&& keyBytes);
+    explicit CryptoManager(std::vector<std::byte>&& sessionKey);
 
-    std::vector<std::byte> encrypt(std::span<const std::byte> bytes);
-    std::vector<std::byte> decrypt(std::span<const std::byte> bytes);
+    std::vector<std::byte> encrypt(std::span<const std::byte> input);
+    std::vector<std::byte> decrypt(std::span<const std::byte> input);
 
-    bool verify(std::span<const std::byte> bytes);
+    bool verify(std::span<const std::byte> input);
 
 public:
     static Result<std::vector<std::byte>>

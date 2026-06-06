@@ -54,6 +54,7 @@ Session::~Session() { disconnect(); }
 bool Session::isCompressed() const noexcept { return mCompressionType.has_value(); }
 
 void Session::setCompression(CompressionType type, std::int32_t threshold) noexcept {
+    (void)flushUnlocked();
     std::scoped_lock lock{mMutex};
     mCompressionType      = type;
     mCompressionThreshold = threshold;
@@ -61,7 +62,8 @@ void Session::setCompression(CompressionType type, std::int32_t threshold) noexc
 
 bool Session::isEncrypted() const noexcept { return mEncryption.has_value(); }
 
-void Session::setEncrypted(std::vector<std::byte> key) noexcept {
+void Session::setEncrypted(std::vector<std::byte>&& key) noexcept {
+    (void)flushUnlocked();
     std::scoped_lock lock{mMutex};
     mEncryption.emplace(std::move(key));
 }
@@ -91,7 +93,7 @@ bool Session::sendPacketImmediately(BufferView buffer) {
 }
 
 bool Session::flush() {
-    std::scoped_lock lock{mMutex};
+    std::scoped_lock lock{mMutex}; // TODO: ??
     mNextFlushAt = std::chrono::steady_clock::now() + FLUSH_INTERVAL;
     return flushUnlocked();
 }
@@ -105,11 +107,7 @@ bool Session::flushIfDue(std::chrono::steady_clock::time_point now) noexcept {
         return false;
     }
 
-    std::scoped_lock lock{mMutex};
-    if (now < mNextFlushAt) {
-        return false;
-    }
-
+    // std::scoped_lock lock{mMutex}; // TODO: ??
     mNextFlushAt = now + FLUSH_INTERVAL;
     return flushUnlocked();
 }
@@ -172,18 +170,10 @@ bool Session::sendBatchedBufferImmediately(Buffer&& packetsBuffer) noexcept {
     Buffer       finalBuffer{};
     BinaryStream compressedStream{finalBuffer};
 
-    std::optional<CompressionType> compressionType{};
-    std::size_t                    compressionThreshold{};
-    {
-        std::scoped_lock lock{mMutex};
-        compressionType      = mCompressionType;
-        compressionThreshold = mCompressionThreshold;
-    }
-
-    if (compressionType.has_value()) {
+    if (mCompressionType.has_value()) {
         auto headerType = CompressionType::None;
-        if (packetsBuffer.size() >= compressionThreshold) {
-            headerType = *compressionType;
+        if (packetsBuffer.size() >= mCompressionThreshold) {
+            headerType = *mCompressionType;
             switch (headerType) {
             case CompressionType::Zlib: {
                 packetsBuffer = compression::zlib::compress(packetsBuffer);
@@ -203,11 +193,8 @@ bool Session::sendBatchedBufferImmediately(Buffer&& packetsBuffer) noexcept {
 
     compressedStream.writeAndMoveBuffer(std::move(packetsBuffer));
 
-    {
-        std::scoped_lock lock{mMutex};
-        if (mEncryption.has_value()) {
-            finalBuffer = mEncryption->encrypt(finalBuffer);
-        }
+    if (mEncryption.has_value()) {
+        finalBuffer = mEncryption->encrypt(finalBuffer);
     }
 
     if (finalBuffer.empty()) {

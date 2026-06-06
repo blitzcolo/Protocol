@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <cstring>
 #include <memory>
-#include <mutex>
 #include <openssl/ec.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
@@ -219,37 +218,37 @@ std::vector<std::byte> CryptoManager::ctrCrypt(EvpCipherCtxPtr& ctx, std::span<c
     return output;
 }
 
-std::vector<std::byte> CryptoManager::encrypt(std::span<const std::byte> bytes) {
-    if (bytes.empty()) {
+std::vector<std::byte> CryptoManager::encrypt(std::span<const std::byte> input) {
+    if (input.empty()) {
         return {};
     }
 
-    std::vector<std::byte> data{bytes.begin(), bytes.end()};
+    std::vector<std::byte> data{input.begin(), input.end()};
     const std::byte*       payload     = data.data();
     const std::size_t      payloadSize = data.size();
     const auto             sum         = checksum(mEncryptCounter++, payload, payloadSize);
     data.insert(data.end(), sum.begin(), sum.end());
 
     if (!mEncryptCtx && !initializeCipher(mEncryptCtx, true)) {
-        return {bytes.begin(), bytes.end()};
+        return {input.begin(), input.end()};
     }
 
     return ctrCrypt(mEncryptCtx, data);
 }
 
-std::vector<std::byte> CryptoManager::decrypt(std::span<const std::byte> bytes) {
-    if (bytes.empty()) {
+std::vector<std::byte> CryptoManager::decrypt(std::span<const std::byte> input) {
+    if (input.empty()) {
         return {};
     }
-    if (bytes.size() < CHECKSUM_SIZE) {
+    if (input.size() < CHECKSUM_SIZE) {
         return {};
     }
 
     if (!mDecryptCtx && !initializeCipher(mDecryptCtx, false)) {
-        return {bytes.begin(), bytes.end()};
+        return {input.begin(), input.end()};
     }
 
-    auto clear = ctrCrypt(mDecryptCtx, bytes);
+    auto clear = ctrCrypt(mDecryptCtx, input);
     if (!verify(clear)) {
         return {};
     }
@@ -258,14 +257,14 @@ std::vector<std::byte> CryptoManager::decrypt(std::span<const std::byte> bytes) 
     return clear;
 }
 
-bool CryptoManager::verify(std::span<const std::byte> bytes) {
-    if (bytes.size() < CHECKSUM_SIZE) {
+bool CryptoManager::verify(std::span<const std::byte> input) {
+    if (input.size() < CHECKSUM_SIZE) {
         return false;
     }
 
-    const std::size_t payloadSize = bytes.size() - CHECKSUM_SIZE;
-    const auto        expected    = checksum(mDecryptCounter++, bytes.data(), payloadSize);
-    return std::equal(expected.begin(), expected.end(), bytes.begin() + static_cast<std::ptrdiff_t>(payloadSize));
+    const std::size_t payloadSize = input.size() - CHECKSUM_SIZE;
+    const auto        expected    = checksum(mDecryptCounter++, input.data(), payloadSize);
+    return std::equal(expected.begin(), expected.end(), input.begin() + static_cast<std::ptrdiff_t>(payloadSize));
 }
 
 } // namespace sculk::protocol::inline abi_v944

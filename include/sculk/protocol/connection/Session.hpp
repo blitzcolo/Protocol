@@ -67,7 +67,7 @@ public:
 
     [[nodiscard]] bool isEncrypted() const noexcept;
 
-    void setEncrypted(std::vector<std::byte> key) noexcept;
+    void setEncrypted(std::vector<std::byte>&& key) noexcept;
 
     bool sendPacket(Buffer&& Buffer);
 
