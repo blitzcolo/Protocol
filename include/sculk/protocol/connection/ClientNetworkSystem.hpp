@@ -26,6 +26,8 @@ class ClientIoRuntime;
 }
 
 class ClientNetworkSystem final {
+    friend class io::ClientIoRuntime;
+
 public:
     using ConnectionEventCallback = std::function<void()>;
     using PacketReceiveCallback   = std::function<void(std::unique_ptr<IPacket>&& packet)>;
@@ -51,14 +53,6 @@ public:
 
     [[nodiscard]] bool isConnected() const noexcept;
 
-    [[nodiscard]] bool sendPacket(const IPacket& packet);
-
-    [[nodiscard]] bool sendPacketImmediately(const IPacket& packet);
-
-    [[nodiscard]] std::unique_ptr<IPacket> receivePacket() noexcept;
-
-    [[nodiscard]] coro::Task<Result<std::unique_ptr<IPacket>>> receivePacketAsync();
-
     [[nodiscard]] bool getServerNetworkStatus(NetworkStatus& outStatus) const noexcept;
 
     bool setOnConnected(ConnectionEventCallback callback) noexcept;
@@ -67,37 +61,23 @@ public:
 
     bool setOnPacketReceive(PacketReceiveCallback callback);
 
-    void setPacketCallbackTakesOverInbound(bool enabled) noexcept;
-
     [[nodiscard]] Session& getSession() const noexcept;
 
     [[nodiscard]] bool getNetworkStatus(NetworkStatus& outStatus) const noexcept;
-
-    [[nodiscard]] bool ioTickOnce() noexcept;
 
 private:
     struct RakPeerDeleter {
         void operator()(RakNet::RakPeerInterface* peer) const noexcept;
     };
 
-    struct CallbacksState {
-        ConnectionEventCallback mOnConnected{};
-        ConnectionEventCallback mOnDisconnected{};
-        PacketReceiveCallback   mOnPacketReceive{};
-    };
-
 private:
+    [[nodiscard]] bool ioTickOnce() noexcept;
+
     void receiveLoop(std::stop_token stopToken);
 
     void flushLoop(std::stop_token stopToken);
 
     void processIncomingPacket(RakNet::Packet* packet);
-
-    void submitConnectedEvent() noexcept;
-
-    void submitDisconnectedEvent() noexcept;
-
-    void submitPacketEvent(std::unique_ptr<IPacket>&& packet) noexcept;
 
 private:
     std::unique_ptr<RakNet::RakPeerInterface, RakPeerDeleter> mPeer{};
@@ -107,8 +87,9 @@ private:
     std::jthread                                              mReceiveThread{};
     std::jthread                                              mFlushThread{};
     std::atomic<std::shared_ptr<Session>>                     mSession{};
-    std::atomic<std::shared_ptr<const CallbacksState>>        mCallbacksState{};
-    std::atomic_bool                                          mCallbackTakesOverInbound{true};
+    ConnectionEventCallback                                   mOnConnected{};
+    ConnectionEventCallback                                   mOnDisconnected{};
+    PacketReceiveCallback                                     mOnPacketReceive{};
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE

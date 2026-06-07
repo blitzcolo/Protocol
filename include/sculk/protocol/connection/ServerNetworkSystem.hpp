@@ -57,14 +57,6 @@ public:
 
     [[nodiscard]] bool isRunning() const noexcept;
 
-    [[nodiscard]] bool sendPacket(const RakNet::RakNetGUID& guid, const IPacket& packet);
-
-    [[nodiscard]] bool sendPacketImmediately(const RakNet::RakNetGUID& guid, const IPacket& packet);
-
-    [[nodiscard]] std::unique_ptr<IPacket> receivePacket(const RakNet::RakNetGUID& guid) noexcept;
-
-    [[nodiscard]] coro::Task<Result<std::unique_ptr<IPacket>>> receivePacketAsync(const RakNet::RakNetGUID& guid);
-
     [[nodiscard]] bool getClientNetworkStatus(const RakNet::RakNetGUID& guid, NetworkStatus& outStatus) const noexcept;
 
     [[nodiscard]] std::size_t getSessionsCount() const;
@@ -73,13 +65,11 @@ public:
 
     bool setOnDisconnected(ConnectionEventCallback&& callback) noexcept;
 
-    bool setOnNetworkEvent(ConnectionEventCallback&& callback) noexcept;
-
     bool setOnPacketReceive(PacketReceiveCallback&& callback);
 
-    void setPacketCallbackTakesOverInbound(bool enabled) noexcept;
-
     [[nodiscard]] std::shared_ptr<Session> getSession(const RakNet::RakNetGUID& guid) const noexcept;
+
+    void disconnectClient(const RakNet::RakNetGUID& guid) noexcept;
 
 private:
     struct RakPeerDeleter {
@@ -89,13 +79,6 @@ private:
     struct SessionsState {
         std::unordered_map<std::uint64_t, std::shared_ptr<Session>> mByGuid{};
         std::vector<std::shared_ptr<Session>>                       mOrdered{};
-    };
-
-    struct CallbacksState {
-        ConnectionEventCallback mOnConnected{};
-        ConnectionEventCallback mOnDisconnected{};
-        ConnectionEventCallback mOnNetworkEvent{};
-        PacketReceiveCallback   mOnPacketReceive{};
     };
 
 private:
@@ -109,16 +92,6 @@ private:
 
     std::shared_ptr<Session> removeSession(std::uint64_t key);
 
-    void submitConnectedEvent(const RakNet::RakNetGUID& guid, const RakNet::SystemAddress& address) noexcept;
-
-    void submitDisconnectedEvent(const RakNet::RakNetGUID& guid, const RakNet::SystemAddress& address) noexcept;
-
-    void submitPacketEvent(
-        const RakNet::RakNetGUID&    guid,
-        const RakNet::SystemAddress& address,
-        std::unique_ptr<IPacket>&&   packet
-    ) noexcept;
-
 private:
     std::uint32_t                                             mMaxConnections{};
     std::uint16_t                                             mIpv4Port{};
@@ -131,8 +104,9 @@ private:
     std::jthread                                              mReceiveThread{};
     std::jthread                                              mFlushThread{};
     std::atomic<std::shared_ptr<const SessionsState>>         mSessionsState{};
-    std::atomic<std::shared_ptr<const CallbacksState>>        mCallbacksState{};
-    std::atomic_bool                                          mCallbackTakesOverInbound{true};
+    ConnectionEventCallback                                   mOnConnected{};
+    ConnectionEventCallback                                   mOnDisconnected{};
+    PacketReceiveCallback                                     mOnPacketReceive{};
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
