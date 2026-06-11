@@ -380,15 +380,19 @@ Result<Session::Buffer> Session::serializeBatchedPackets(const BatchedBuffer& pa
 }
 
 Result<Session::BatchedBuffer> Session::deserializeBatchPackets(std::span<const std::byte> batchedBuffer) {
+    Buffer decryptedBuffer{};
+
     if (mEncryption.has_value()) {
         auto decrypted = mEncryption->decrypt(batchedBuffer);
         if (!decrypted) {
             return error_utils::makeError("Failed to decrypt data");
         }
-        batchedBuffer = *decrypted;
+        decryptedBuffer = std::move(*decrypted);
+    } else {
+        decryptedBuffer.assign(batchedBuffer.begin(), batchedBuffer.end());
     }
 
-    ReadOnlyBinaryStream compressedStream{batchedBuffer};
+    ReadOnlyBinaryStream compressedStream{decryptedBuffer};
     Buffer               decompressedBuffer{};
 
     if (mCompressionType.has_value()) {
@@ -398,10 +402,9 @@ Result<Session::BatchedBuffer> Session::deserializeBatchPackets(std::span<const 
         }
 
         const auto compressedPayload = compressedStream.getLeftBufferView();
-        Buffer     compressedBuffer(compressedPayload.begin(), compressedPayload.end());
         switch (type) {
         case CompressionType::Zlib: {
-            auto res = compression::zlib::decompress(compressedBuffer);
+            auto res = compression::zlib::decompress(compressedPayload);
             if (!res) {
                 return error_utils::makeError("zlib decompression failed");
             }
@@ -409,19 +412,22 @@ Result<Session::BatchedBuffer> Session::deserializeBatchPackets(std::span<const 
             break;
         }
         case CompressionType::Snappy: {
-            auto res = compression::snappy::decompress(compressedBuffer);
+            auto res = compression::snappy::decompress(compressedPayload);
             if (!res) {
                 return error_utils::makeError("snappy decompression failed");
             }
             decompressedBuffer = std::move(*res);
             break;
         }
-        default:
-            decompressedBuffer = std::move(compressedBuffer);
+        case CompressionType::None: {
+            decompressedBuffer.assign(compressedPayload.begin(), compressedPayload.end());
             break;
         }
+        default:
+            return error_utils::makeError("unknown compression type in batch packet");
+        }
     } else {
-        decompressedBuffer.assign(batchedBuffer.begin(), batchedBuffer.end());
+        decompressedBuffer.assign(decryptedBuffer.begin(), decryptedBuffer.end());
     }
 
     ReadOnlyBinaryStream stream{decompressedBuffer};
