@@ -42,8 +42,7 @@ std::string MoveActorAbsolutePacket::toString() const {
         SCULK_FORMAT_FIELD(mPosition),
         SCULK_FORMAT_FIELD(mRotationX),
         SCULK_FORMAT_FIELD(mRotationY),
-        SCULK_FORMAT_FIELD(mRotationYHead),
-        SCULK_FORMAT_FIELD(mForceCompletion)
+        SCULK_FORMAT_FIELD(mRotationYHead)
     );
 }
 #endif
