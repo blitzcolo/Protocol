@@ -7,6 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/Version.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -18,3 +19,5 @@ enum class AuthenticationType : std::int8_t {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(AuthenticationType, 0, 2);

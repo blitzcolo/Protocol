@@ -8,6 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/math/Vec2.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
@@ -44,5 +45,8 @@ public:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(CameraAimAssistPacket::Action, 0, 1);
+SCULK_PROTOCOL_ENUM_RANGE(CameraAimAssistPacket::TargetMode, 0, 1);
 
 SCULK_PROTOCOL_PACKET_FORMATTER(CameraAimAssistPacket)

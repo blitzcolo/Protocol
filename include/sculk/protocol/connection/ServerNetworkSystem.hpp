@@ -43,8 +43,6 @@ public:
     ~ServerNetworkSystem();
 
 public:
-    [[nodiscard]] bool start(std::uint16_t ipv4Port, std::uint32_t maxConnections);
-
     [[nodiscard]] bool start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, std::uint32_t maxConnections);
 
     void setMotd(std::string_view motd);
@@ -95,7 +93,7 @@ private:
 private:
     std::uint32_t                                             mMaxConnections{};
     std::uint16_t                                             mIpv4Port{};
-    std::optional<std::uint16_t>                              mIpv6Port{};
+    std::uint16_t                                             mIpv6Port{};
     std::string                                               mMotd{};
     std::unique_ptr<RakNet::RakPeerInterface, RakPeerDeleter> mPeer{};
     std::unique_ptr<thread::ThreadPool>                       mOwnedThreadPool{};

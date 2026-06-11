@@ -6,6 +6,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #pragma once
+#include "sculk/protocol/Version.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include <cstddef>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -145,3 +147,5 @@ enum class ActorFlags : int {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(ActorFlags, 0, 130);

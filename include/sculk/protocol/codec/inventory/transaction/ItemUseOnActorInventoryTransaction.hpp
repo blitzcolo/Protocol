@@ -8,6 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/inventory/item/NetworkItemStackDescriptor.hpp"
 #include "sculk/protocol/codec/math/Vec3.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
@@ -34,3 +35,5 @@ public:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(ItemUseOnActorInventoryTransaction::ActionType, 0, 2);

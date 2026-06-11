@@ -6,8 +6,8 @@
 // SPDX-License-Identifier: MPL-2.0
 
 #include "sculk/protocol/auth/ConnectionRequest.hpp"
+#include "../ssl/Base64Url.hpp"
 #include "../ssl/PemHelper.hpp"
-#include "sculk/protocol/utility/Base64Url.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 #include <limits>

@@ -1,4 +1,4 @@
-﻿// Copyright © 2026 SculkCatalystMC. All rights reserved.
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
 // distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -11,6 +11,7 @@
 #include "sculk/protocol/codec/math/Vec3.hpp"
 #include "sculk/protocol/codec/nbt/TagVariant.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 #include <variant>
 
@@ -48,3 +49,5 @@ public:
 
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(MetaData::DataItemType, 0, 9);

@@ -1,4 +1,4 @@
-﻿// Copyright © 2026 SculkCatalystMC. All rights reserved.
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
 // distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -7,11 +7,16 @@
 
 #pragma once
 #include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-enum class ActorLinkType : std::uint8_t { None = 0, Riding = 1, Passenger = 2 };
+enum class ActorLinkType : std::uint8_t {
+    None      = 0,
+    Riding    = 1,
+    Passenger = 2,
+};
 
 struct ActorLink {
     ActorLinkType mType{};
@@ -27,3 +32,5 @@ struct ActorLink {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(ActorLinkType, 0, 2);

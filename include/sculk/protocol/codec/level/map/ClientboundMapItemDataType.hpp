@@ -7,6 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/Version.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include <cstdint>
 #include <utility>
 
@@ -31,3 +32,5 @@ operator&(const ClientboundMapItemDataType lhs, const ClientboundMapItemDataType
 }
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(ClientboundMapItemDataType, 0, 14);

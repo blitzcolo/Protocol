@@ -51,32 +51,6 @@ ServerNetworkSystem::ServerNetworkSystem(thread::ThreadPool& threadPool)
 
 ServerNetworkSystem::~ServerNetworkSystem() { stop(); }
 
-bool ServerNetworkSystem::start(std::uint16_t ipv4Port, std::uint32_t maxConnections) {
-    if (mRunning.exchange(true, std::memory_order_acq_rel)) {
-        return false;
-    }
-
-    mIpv4Port = ipv4Port;
-    mIpv6Port.reset();
-    mMaxConnections = maxConnections;
-
-    RakNet::SocketDescriptor socketDescriptor{mIpv4Port, nullptr};
-    socketDescriptor.socketFamily = AF_INET;
-
-    const auto status = mPeer->Startup(mMaxConnections, &socketDescriptor, 1);
-    if (status != RakNet::RAKNET_STARTED) {
-        mRunning.store(false, std::memory_order_release);
-        return false;
-    }
-
-    mPeer->SetMaximumIncomingConnections(mMaxConnections);
-    updateAnnouncement();
-
-    mReceiveThread = std::jthread([this](std::stop_token token) { receiveLoop(token); });
-    mFlushThread   = std::jthread([this](std::stop_token token) { flushLoop(token); });
-    return true;
-}
-
 bool ServerNetworkSystem::start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, std::uint32_t maxConnections) {
     if (mRunning.exchange(true, std::memory_order_acq_rel)) {
         return false;
@@ -87,8 +61,8 @@ bool ServerNetworkSystem::start(std::uint16_t ipv4Port, std::uint16_t ipv6Port, 
     mMaxConnections = maxConnections;
 
     std::array<RakNet::SocketDescriptor, 2> descriptors{
-        RakNet::SocketDescriptor{mIpv4Port,  nullptr},
-        RakNet::SocketDescriptor{*mIpv6Port, nullptr}
+        RakNet::SocketDescriptor{mIpv4Port, nullptr},
+        RakNet::SocketDescriptor{mIpv6Port, nullptr}
     };
     descriptors[0].socketFamily = AF_INET;
     descriptors[1].socketFamily = AF_INET6;
@@ -122,7 +96,7 @@ void ServerNetworkSystem::updateAnnouncement() noexcept {
         mMaxConnections,
         mPeer->GetMyGUID().ToString(),
         mIpv4Port,
-        mIpv6Port.value_or(0)
+        mIpv6Port
     );
     std::uint16_t length = static_cast<std::uint16_t>(message.size());
     message.insert(0, 2, '\0');

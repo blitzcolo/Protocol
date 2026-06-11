@@ -8,6 +8,7 @@
 #pragma once
 #include "BiomeCoordinateData.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -37,3 +38,5 @@ struct BiomeScatterParamData {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(BiomeScatterParamData::CoordinateEvaluationOrder, 0, 5);

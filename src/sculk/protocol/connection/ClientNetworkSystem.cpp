@@ -43,10 +43,11 @@ bool ClientNetworkSystem::connect(std::string_view host, std::uint16_t port) {
         return false;
     }
 
-    RakNet::SocketDescriptor descriptor{};
-    descriptor.socketFamily = AF_INET;
+    std::array<RakNet::SocketDescriptor, 2> descriptor{};
+    descriptor[0].socketFamily = AF_INET;
+    descriptor[1].socketFamily = AF_INET6;
 
-    const auto startupResult = mPeer->Startup(1, &descriptor, 1);
+    const auto startupResult = mPeer->Startup(1, descriptor.data(), 2);
     if (startupResult != RakNet::RAKNET_STARTED) {
         mRunning.store(false, std::memory_order_release);
         return false;

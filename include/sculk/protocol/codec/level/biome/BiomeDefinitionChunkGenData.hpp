@@ -19,6 +19,7 @@
 #include "BiomeSurfaceMaterialAdjustmentData.hpp"
 #include "BiomeSurfaceMaterialData.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -50,3 +51,5 @@ struct BiomeDefinitionChunkGenData {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(BiomeDefinitionChunkGenData::VillageType, 0, 4);

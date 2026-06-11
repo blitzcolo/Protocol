@@ -7,6 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/Version.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
@@ -266,3 +267,5 @@ enum class MinecraftPacketIds : int {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(MinecraftPacketIds, 0, 348);

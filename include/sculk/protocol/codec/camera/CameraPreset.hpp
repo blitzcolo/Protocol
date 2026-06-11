@@ -1,4 +1,4 @@
-﻿// Copyright © 2026 SculkCatalystMC. All rights reserved.
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
 // distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -10,6 +10,7 @@
 #include "sculk/protocol/codec/camera/CameraAimAssist.hpp"
 #include "sculk/protocol/codec/math/Vec2.hpp"
 #include "sculk/protocol/codec/math/Vec3.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
@@ -51,3 +52,5 @@ public:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(CameraPreset::AudioListener, 0, 1);

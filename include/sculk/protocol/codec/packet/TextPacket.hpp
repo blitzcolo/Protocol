@@ -7,6 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/codec/packet/IPacket.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include <variant>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -65,5 +66,7 @@ public:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(TextPacket::Type, 0, 11);
 
 SCULK_PROTOCOL_PACKET_FORMATTER(TextPacket)

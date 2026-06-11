@@ -7,6 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -29,3 +30,5 @@ struct ColorAttributeData {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(ColorAttributeOperation, 0, 4);

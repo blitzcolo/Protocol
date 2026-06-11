@@ -12,6 +12,7 @@
 #include "Identity.hpp"
 #include "LegacyCertificateChain.hpp"
 #include "LoginToken.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <optional>
 #include <string>
@@ -73,3 +74,5 @@ public:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(ConnectionRequest::VerificationStatus, 0, 3);

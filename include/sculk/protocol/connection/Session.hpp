@@ -9,6 +9,7 @@
 #include "sculk/protocol/connection/NetworkStatus.hpp"
 #include "sculk/protocol/connection/coro/Task.hpp"
 #include "sculk/protocol/connection/encryption/CryptoManager.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/Result.hpp"
 #include <RakPeerInterface.h>
 #include <atomic>
@@ -115,3 +116,5 @@ private:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(Session::CompressionType, -1, 1);

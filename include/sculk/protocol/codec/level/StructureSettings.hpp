@@ -1,4 +1,4 @@
-﻿// Copyright © 2026 SculkCatalystMC. All rights reserved.
+// Copyright © 2026 SculkCatalystMC. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. If a copy of the MPL was not
 // distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -8,6 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/level/block/BlockPos.hpp"
 #include "sculk/protocol/codec/math/Vec3.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
@@ -58,3 +59,7 @@ public:
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::AnimationMode, 0, 2);
+SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::Mirror, 0, 3);
+SCULK_PROTOCOL_ENUM_RANGE(StructureSettings::Rotation, 0, 3);

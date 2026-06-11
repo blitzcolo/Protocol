@@ -8,6 +8,7 @@
 #pragma once
 #include "sculk/protocol/codec/level/block/BlockPos.hpp"
 #include "sculk/protocol/utility/BinaryStream.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -29,3 +30,5 @@ struct MapTrackedActorUniqueId {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(MapTrackedActorUniqueId::Type, 0, 2);

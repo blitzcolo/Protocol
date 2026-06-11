@@ -7,6 +7,7 @@
 
 #pragma once
 #include "sculk/protocol/Version.hpp"
+#include "sculk/protocol/utility/Enum.hpp"
 #include <cstdint>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
@@ -87,3 +88,5 @@ enum class AchievementIds : std::int32_t {
 };
 
 } // namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE
+
+SCULK_PROTOCOL_ENUM_RANGE(AchievementIds, 7, 116);

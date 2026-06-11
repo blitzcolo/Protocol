@@ -19,10 +19,10 @@ option(PROTOCOL_ENABLE_CONNECTION "Enable connection features" ON)
 option(PROTOCOL_ENABLE_EXCEPTIONS "Enable C++ exceptions for Protocol target" OFF)
 option(PROTOCOL_ENABLE_FORMATTING "Enable string formatting support for Protocol target" OFF)
 
-if(PROTOCOL_ENABLE_CONNECTION AND NOT PROTOCOL_ENABLE_CODEC)
+if(PROTOCOL_ENABLE_CONNECTION AND(NOT PROTOCOL_ENABLE_CODEC OR NOT PROTOCOL_ENABLE_AUTHENTICATION))
     message(FATAL_ERROR
-        "Invalid configuration: CONNECTION requires CODEC. "
-        "Set PROTOCOL_ENABLE_CODEC=ON or PROTOCOL_ENABLE_CONNECTION=OFF."
+        "Invalid configuration: CONNECTION requires CODEC and AUTHENTICATION. "
+        "Set PROTOCOL_ENABLE_CODEC=ON and PROTOCOL_ENABLE_AUTHENTICATION=ON or PROTOCOL_ENABLE_CONNECTION=OFF."
     )
 endif()
 
@@ -207,7 +207,10 @@ if(PROTOCOL_ENABLE_CONNECTION)
         $<BUILD_INTERFACE:RakNetLibStatic>
         $<INSTALL_INTERFACE:RakNetLibStatic::RakNetLibStatic>
     )
-    target_compile_definitions(Protocol PUBLIC RAKNET_SUPPORT_IPV6=1)
+    target_compile_definitions(Protocol PUBLIC
+        RAKNET_SUPPORT_IPV6=1
+        SCULK_PROTOCOL_ENABLE_CONNECTION
+    )
 endif()
 
 if(PROTOCOL_SOURCES)
@@ -242,6 +245,7 @@ if(MSVC)
     target_compile_options(Protocol PRIVATE
         /W4
         /utf-8
+        /GR-
         $<$<NOT:$<BOOL:${PROTOCOL_ENABLE_EXCEPTIONS}>>:/EHs-c->
         $<$<CONFIG:Release>:/O2>
         $<$<CONFIG:RelWithDebInfo>:/O2>
@@ -256,6 +260,7 @@ else()
         -Wall
         -Wextra
         -Wpedantic
+        -fno-rtti
         $<$<NOT:$<BOOL:${PROTOCOL_ENABLE_EXCEPTIONS}>>:-fno-exceptions>
         $<$<CONFIG:Release>:-O3>
         $<$<CONFIG:RelWithDebInfo>:-O3>
