@@ -10,18 +10,21 @@
 #include "sculk/protocol/utility/BinaryStream.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
 #include "sculk/protocol/utility/ReadOnlyBinaryStream.hpp"
-#include <map>
-#include <optional>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
 struct CameraAimAssistCategoryPriorities {
-    std::map<std::string, std::int32_t> mEntities{};
-    std::map<std::string, std::int32_t> mBlocks{};
-    std::optional<std::int32_t>         mEntityDefault{};
-    std::optional<std::int32_t>         mBlockDefault{};
-    std::map<std::string, std::int32_t> mBlockTags{};
-    std::map<std::string, std::int32_t> mEntityTypeFamilies{};
+    struct PriorityEntry {
+        std::string  mName{};
+        std::int32_t mPriority{};
+    };
+
+    std::vector<PriorityEntry>  mEntities{};
+    std::vector<PriorityEntry>  mBlocks{};
+    std::optional<std::int32_t> mEntityDefault{};
+    std::optional<std::int32_t> mBlockDefault{};
+    std::vector<PriorityEntry>  mBlockTags{};
+    std::vector<PriorityEntry>  mEntityTypeFamilies{};
 
     void write(BinaryStream& stream) const;
 
@@ -47,17 +50,22 @@ struct CameraAimAssistCategoriesDefinition {
 };
 
 struct CameraAimAssistPresetDefinition {
-    std::string                        mIdentifier{};
-    std::string                        mCategories{};
-    std::vector<std::string>           mExclusionList{};
-    std::vector<std::string>           mLiquidTargetingList{};
-    std::map<std::string, std::string> mItemSettings{};
-    std::optional<std::string>         mDefaultItemSettings{};
-    std::optional<std::string>         mHandSettings{};
-    std::vector<std::string>           mBlockExclusionList{};
-    std::vector<std::string>           mBlockTagExclusionList{};
-    std::vector<std::string>           mEntityExclusionList{};
-    std::vector<std::string>           mEntityTypeFamilyExclusionList{};
+    struct ItemSetting {
+        std::string mItemName{};
+        std::string mCategory{};
+    };
+
+    std::string                mIdentifier{};
+    std::string                mCategories{};
+    std::vector<std::string>   mExclusionList{};
+    std::vector<std::string>   mLiquidTargetingList{};
+    std::vector<ItemSetting>   mItemSettings{};
+    std::optional<std::string> mDefaultItemSettings{};
+    std::optional<std::string> mHandSettings{};
+    std::vector<std::string>   mBlockExclusionList{};
+    std::vector<std::string>   mBlockTagExclusionList{};
+    std::vector<std::string>   mEntityExclusionList{};
+    std::vector<std::string>   mEntityTypeFamilyExclusionList{};
 
     void write(BinaryStream& stream) const;
 

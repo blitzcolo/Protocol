@@ -9,68 +9,44 @@
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
-namespace {
-
-inline void writePriorityMap(BinaryStream& stream, const std::map<std::string, std::int32_t>& values) {
-    stream.writeUnsignedVarInt(static_cast<std::uint32_t>(values.size()));
-    for (const auto& [name, priority] : values) {
-        stream.writeString(name);
-        stream.writeSignedInt(priority);
-    }
-}
-
-inline Result<> readPriorityMap(ReadOnlyBinaryStream& stream, std::map<std::string, std::int32_t>& values) {
-    values.clear();
-    std::uint32_t size{};
-    _SCULK_READ(stream.readUnsignedVarInt(size));
-    for (std::uint32_t i = 0; i < size; ++i) {
-        std::string  name{};
-        std::int32_t priority{};
-        _SCULK_READ(stream.readString(name));
-        _SCULK_READ(stream.readSignedInt(priority));
-        values.emplace(std::move(name), priority);
-    }
-    return {};
-}
-
-inline void writeStringMap(BinaryStream& stream, const std::map<std::string, std::string>& values) {
-    stream.writeUnsignedVarInt(static_cast<std::uint32_t>(values.size()));
-    for (const auto& [name, category] : values) {
-        stream.writeString(name);
-        stream.writeString(category);
-    }
-}
-
-inline Result<> readStringMap(ReadOnlyBinaryStream& stream, std::map<std::string, std::string>& values) {
-    values.clear();
-    std::uint32_t size{};
-    _SCULK_READ(stream.readUnsignedVarInt(size));
-    for (std::uint32_t i = 0; i < size; ++i) {
-        std::string name{};
-        std::string category{};
-        _SCULK_READ(stream.readString(name));
-        _SCULK_READ(stream.readString(category));
-        values.emplace(std::move(name), std::move(category));
-    }
-    return {};
-}
-
-} // namespace
-
 void CameraAimAssistCategoryPriorities::write(BinaryStream& stream) const {
-    writePriorityMap(stream, mEntities);
-    writePriorityMap(stream, mBlocks);
-    writePriorityMap(stream, mBlockTags);
-    writePriorityMap(stream, mEntityTypeFamilies);
+    stream.writeArray(mEntities, [](BinaryStream& stream, const PriorityEntry& entry) {
+        stream.writeString(entry.mName);
+        stream.writeSignedInt(entry.mPriority);
+    });
+    stream.writeArray(mBlocks, [](BinaryStream& stream, const PriorityEntry& entry) {
+        stream.writeString(entry.mName);
+        stream.writeSignedInt(entry.mPriority);
+    });
+    stream.writeArray(mBlockTags, [](BinaryStream& stream, const PriorityEntry& entry) {
+        stream.writeString(entry.mName);
+        stream.writeSignedInt(entry.mPriority);
+    });
+    stream.writeArray(mEntityTypeFamilies, [](BinaryStream& stream, const PriorityEntry& entry) {
+        stream.writeString(entry.mName);
+        stream.writeSignedInt(entry.mPriority);
+    });
     stream.writeOptional(mEntityDefault, &BinaryStream::writeSignedInt);
     stream.writeOptional(mBlockDefault, &BinaryStream::writeSignedInt);
 }
 
 Result<> CameraAimAssistCategoryPriorities::read(ReadOnlyBinaryStream& stream) {
-    _SCULK_READ(readPriorityMap(stream, mEntities));
-    _SCULK_READ(readPriorityMap(stream, mBlocks));
-    _SCULK_READ(readPriorityMap(stream, mBlockTags));
-    _SCULK_READ(readPriorityMap(stream, mEntityTypeFamilies));
+    _SCULK_READ(stream.readArray(mEntities, [](ReadOnlyBinaryStream& stream, PriorityEntry& entry) {
+        _SCULK_READ(stream.readString(entry.mName));
+        return stream.readSignedInt(entry.mPriority);
+    }));
+    _SCULK_READ(stream.readArray(mBlocks, [](ReadOnlyBinaryStream& stream, PriorityEntry& entry) {
+        _SCULK_READ(stream.readString(entry.mName));
+        return stream.readSignedInt(entry.mPriority);
+    }));
+    _SCULK_READ(stream.readArray(mBlockTags, [](ReadOnlyBinaryStream& stream, PriorityEntry& entry) {
+        _SCULK_READ(stream.readString(entry.mName));
+        return stream.readSignedInt(entry.mPriority);
+    }));
+    _SCULK_READ(stream.readArray(mEntityTypeFamilies, [](ReadOnlyBinaryStream& stream, PriorityEntry& entry) {
+        _SCULK_READ(stream.readString(entry.mName));
+        return stream.readSignedInt(entry.mPriority);
+    }));
     _SCULK_READ(stream.readOptional(mEntityDefault, &ReadOnlyBinaryStream::readSignedInt));
     return stream.readOptional(mBlockDefault, &ReadOnlyBinaryStream::readSignedInt);
 }
@@ -102,7 +78,10 @@ void CameraAimAssistPresetDefinition::write(BinaryStream& stream) const {
     stream.writeArray(mBlockTagExclusionList, &BinaryStream::writeString);
     stream.writeArray(mEntityTypeFamilyExclusionList, &BinaryStream::writeString);
     stream.writeArray(mLiquidTargetingList, &BinaryStream::writeString);
-    writeStringMap(stream, mItemSettings);
+    stream.writeArray(mItemSettings, [](BinaryStream& stream, const ItemSetting& setting) {
+        stream.writeString(setting.mItemName);
+        stream.writeString(setting.mCategory);
+    });
     stream.writeOptional(mDefaultItemSettings, &BinaryStream::writeString);
     stream.writeOptional(mHandSettings, &BinaryStream::writeString);
 }
@@ -114,7 +93,10 @@ Result<> CameraAimAssistPresetDefinition::read(ReadOnlyBinaryStream& stream) {
     _SCULK_READ(stream.readArray(mBlockTagExclusionList, &ReadOnlyBinaryStream::readString));
     _SCULK_READ(stream.readArray(mEntityTypeFamilyExclusionList, &ReadOnlyBinaryStream::readString));
     _SCULK_READ(stream.readArray(mLiquidTargetingList, &ReadOnlyBinaryStream::readString));
-    _SCULK_READ(readStringMap(stream, mItemSettings));
+    _SCULK_READ(stream.readArray(mItemSettings, [](ReadOnlyBinaryStream& stream, ItemSetting& setting) {
+        _SCULK_READ(stream.readString(setting.mItemName));
+        return stream.readString(setting.mCategory);
+    }));
     _SCULK_READ(stream.readOptional(mDefaultItemSettings, &ReadOnlyBinaryStream::readString));
     return stream.readOptional(mHandSettings, &ReadOnlyBinaryStream::readString);
 }

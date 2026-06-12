@@ -9,7 +9,6 @@
 #include "sculk/protocol/codec/math/Vec3.hpp"
 #include "sculk/protocol/codec/packet/IPacket.hpp"
 #include "sculk/protocol/utility/Enum.hpp"
-#include <map>
 
 namespace sculk::protocol::SCULK_ABI_INLINE_NAMESPACE {
 
@@ -70,13 +69,18 @@ public:
         OrbitalOffsetDegrees    = 51,
     };
 
+    struct ParameterKeyFrame {
+        float mTime{};
+        Vec3  mValue{};
+    };
+
 public:
-    std::map<float, Vec3> mParameterKeyFrameValues{};
-    std::string           mBiomeIdentifier{};
-    Type                  mParameterType{};
-    bool                  mResetParameter{};
-    float                 mFloatValue{};
-    Vec3                  mVec3Value{};
+    std::vector<ParameterKeyFrame> mParameterKeyFrameValues{};
+    std::string                    mBiomeIdentifier{};
+    Type                           mParameterType{};
+    bool                           mResetParameter{};
+    float                          mFloatValue{};
+    Vec3                           mVec3Value{};
 
 public:
     [[nodiscard]] MinecraftPacketIds getId() const noexcept override;

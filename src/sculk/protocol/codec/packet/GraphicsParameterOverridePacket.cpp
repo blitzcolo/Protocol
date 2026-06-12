@@ -18,11 +18,10 @@ MinecraftPacketIds GraphicsParameterOverridePacket::getId() const noexcept {
 std::string_view GraphicsParameterOverridePacket::getName() const noexcept { return "GraphicsParameterOverridePacket"; }
 
 void GraphicsParameterOverridePacket::write(BinaryStream& stream) const {
-    stream.writeUnsignedVarInt(static_cast<std::uint32_t>(mParameterKeyFrameValues.size()));
-    for (const auto& [key, value] : mParameterKeyFrameValues) {
-        stream.writeFloat(key);
-        value.write(stream);
-    }
+    stream.writeArray(mParameterKeyFrameValues, [](BinaryStream& stream, const ParameterKeyFrame& keyFrame) {
+        stream.writeFloat(keyFrame.mTime);
+        keyFrame.mValue.write(stream);
+    });
     stream.writeFloat(mFloatValue);
     mVec3Value.write(stream);
     stream.writeString(mBiomeIdentifier);
@@ -31,16 +30,12 @@ void GraphicsParameterOverridePacket::write(BinaryStream& stream) const {
 }
 
 Result<> GraphicsParameterOverridePacket::read(ReadOnlyBinaryStream& stream) {
-    std::uint32_t mapSize{};
-    _SCULK_READ(stream.readUnsignedVarInt(mapSize));
-    mParameterKeyFrameValues.clear();
-    for (std::uint32_t i = 0; i < mapSize; ++i) {
-        float key{};
-        Vec3  value{};
-        _SCULK_READ(stream.readFloat(key));
-        _SCULK_READ(value.read(stream));
-        mParameterKeyFrameValues.emplace(std::move(key), std::move(value));
-    }
+    _SCULK_READ(
+        stream.readArray(mParameterKeyFrameValues, [](ReadOnlyBinaryStream& stream, ParameterKeyFrame& keyFrame) {
+            _SCULK_READ(stream.readFloat(keyFrame.mTime));
+            return keyFrame.mValue.read(stream);
+        })
+    );
     _SCULK_READ(stream.readFloat(mFloatValue));
     _SCULK_READ(mVec3Value.read(stream));
     _SCULK_READ(stream.readString(mBiomeIdentifier));
