@@ -172,7 +172,7 @@ bool Session::sendBatchedBufferImmediately(Buffer&& packetsBuffer) noexcept {
 
     if (mCompressionType.has_value()) {
         auto headerType = CompressionType::None;
-        if (packetsBuffer.size() >= mCompressionThreshold) {
+        if (packetsBuffer.size() >= static_cast<std::size_t>(mCompressionThreshold)) {
             headerType = *mCompressionType;
             switch (headerType) {
             case CompressionType::Zlib: {
@@ -347,7 +347,7 @@ Result<Session::Buffer> Session::serializeBatchedPackets(const BatchedBuffer& pa
 
     if (mCompressionType.has_value()) {
         auto headerType = Session::CompressionType::None;
-        if (packetsBuffer.size() >= mCompressionThreshold) {
+        if (packetsBuffer.size() >= static_cast<std::size_t>(mCompressionThreshold)) {
             headerType = *mCompressionType;
             switch (headerType) {
             case Session::CompressionType::Zlib: {
