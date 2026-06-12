@@ -115,15 +115,13 @@ if(PROTOCOL_ENABLE_CONNECTION)
 
     target_include_directories(Protocol PUBLIC $<BUILD_INTERFACE:${concurrentqueue_SOURCE_DIR}>)
 
-    FetchContent_Declare(
-        parallel_hashmap
-        GIT_REPOSITORY https://github.com/greg7mdp/parallel-hashmap.git
-        GIT_TAG v2.0.0
-    )
-    FetchContent_MakeAvailable(parallel_hashmap)
-
-    target_include_directories(Protocol PUBLIC $<BUILD_INTERFACE:${parallel_hashmap_SOURCE_DIR}>)
-
+    # FetchContent_Declare(
+    # parallel_hashmap
+    # GIT_REPOSITORY https://github.com/greg7mdp/parallel-hashmap.git
+    # GIT_TAG v2.0.0
+    # )
+    # FetchContent_MakeAvailable(parallel_hashmap)
+    # target_include_directories(Protocol PUBLIC $<BUILD_INTERFACE:${parallel_hashmap_SOURCE_DIR}>)
     set(ZLIB_BUILD_TESTING OFF CACHE BOOL "Disable zlib tests" FORCE)
     set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "Disable zlib examples" FORCE)
     set(SKIP_INSTALL_ALL ON CACHE BOOL "Disable zlib install targets" FORCE)
@@ -242,13 +240,17 @@ if(MSVC)
         string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
     endif()
 
+    string(REPLACE "/Ob2" "" CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+    string(REPLACE "/Ob2" "" CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL}")
+
     target_compile_options(Protocol PRIVATE
         /W4
         /utf-8
         /GR-
+        /Zc:preprocessor
         $<$<NOT:$<BOOL:${PROTOCOL_ENABLE_EXCEPTIONS}>>:/EHs-c->
-        $<$<CONFIG:Release>:/O2>
-        $<$<CONFIG:RelWithDebInfo>:/O2>
+        $<$<CONFIG:Release>:/O2 /Ob3>
+        $<$<CONFIG:MinSizeRel>:/O2 /Ob3>
     )
     target_compile_definitions(Protocol PRIVATE
         UNICODE

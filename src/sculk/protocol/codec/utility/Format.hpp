@@ -286,7 +286,7 @@ constexpr std::string formatPacket(const IPacket& packet, Args&&... args) {
 
 #define SCULK_FORMAT_FIELD(FIELD) std::format("{}: {}", #FIELD, formatter::detail::typeToString(FIELD))
 
-#define SCULK_FORMAT_PACKET(...) formatter::formatPacket(*this, __VA_ARGS__);
+#define SCULK_FORMAT_PACKET(...) formatter::formatPacket(*this __VA_OPT__(, ) __VA_ARGS__);
 
 } // namespace formatter
 
